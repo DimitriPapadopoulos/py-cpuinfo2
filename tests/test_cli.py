@@ -1,8 +1,9 @@
 
 
+import sys
 import unittest
-from cpuinfo import *
-import helpers
+from cpuinfo import cpuinfo
+from tests import helpers
 
 
 

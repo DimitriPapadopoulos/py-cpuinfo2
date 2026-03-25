@@ -1,8 +1,8 @@
 
 
 import unittest
-from cpuinfo import *
-import helpers
+from cpuinfo import cpuinfo
+from tests import helpers
 
 
 class MockDataSource:
@@ -23,7 +23,7 @@ class TestInvalidCPU(unittest.TestCase):
 
 	def test_arch_parse_unknown(self):
 		# If the arch is unknown, the result should be null
-		arch, bits = cpuinfo._parse_arch(DataSource.arch_string_raw)
+		arch, bits = cpuinfo._parse_arch(cpuinfo.DataSource.arch_string_raw)
 		self.assertIsNone(arch)
 		self.assertIsNone(bits)
 

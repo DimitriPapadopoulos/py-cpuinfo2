@@ -1,8 +1,9 @@
 
 
 import unittest
-from cpuinfo import *
-import helpers
+from cpuinfo import cpuinfo
+from cpuinfo.cpuinfo import Trace
+from tests import helpers
 
 
 class MockDataSource_enforcing:

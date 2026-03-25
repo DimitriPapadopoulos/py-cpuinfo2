@@ -3,8 +3,8 @@
 # Darwin version 13
 
 import unittest
-from cpuinfo import *
-import helpers
+from cpuinfo import cpuinfo
+from tests import helpers
 
 
 class MockDataSource:
