@@ -91,16 +91,16 @@ class TestSELinux(unittest.TestCase):
 
 	def test_enforcing(self):
 		helpers.monkey_patch_data_source(cpuinfo, MockDataSource_enforcing)
-		self.assertEqual(True, cpuinfo._is_selinux_enforcing(self.trace))
+		assert cpuinfo._is_selinux_enforcing(self.trace) is True
 
 	def test_not_enforcing(self):
 		helpers.monkey_patch_data_source(cpuinfo, MockDataSource_not_enforcing)
-		self.assertEqual(False, cpuinfo._is_selinux_enforcing(self.trace))
+		assert cpuinfo._is_selinux_enforcing(self.trace) is False
 
 	def test_exec_mem_and_heap(self):
 		helpers.monkey_patch_data_source(cpuinfo, MockDataSource_exec_mem_and_heap)
-		self.assertEqual(False, cpuinfo._is_selinux_enforcing(self.trace))
+		assert cpuinfo._is_selinux_enforcing(self.trace) is False
 
 	def test_no_exec_mem_and_heap(self):
 		helpers.monkey_patch_data_source(cpuinfo, MockDataSource_no_exec_mem_and_heap)
-		self.assertEqual(True, cpuinfo._is_selinux_enforcing(self.trace))
+		assert cpuinfo._is_selinux_enforcing(self.trace) is True

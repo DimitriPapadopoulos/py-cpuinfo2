@@ -136,44 +136,44 @@ class TestLinux_mips64el_Loongson3A3000(unittest.TestCase):
 	'''
 
 	def test_returns(self):
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_registry()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpufreq_info()))
-		self.assertEqual(5, len(cpuinfo._get_cpu_info_from_lscpu()))
-		self.assertEqual(6, len(cpuinfo._get_cpu_info_from_proc_cpuinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysctl()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_kstat()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_dmesg()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_ibm_pa_features()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpuid()))
-		self.assertEqual(17, len(cpuinfo._get_cpu_info_internal()))
+		assert len(cpuinfo._get_cpu_info_from_registry()) == 0
+		assert len(cpuinfo._get_cpu_info_from_cpufreq_info()) == 0
+		assert len(cpuinfo._get_cpu_info_from_lscpu()) == 5
+		assert len(cpuinfo._get_cpu_info_from_proc_cpuinfo()) == 6
+		assert len(cpuinfo._get_cpu_info_from_sysctl()) == 0
+		assert len(cpuinfo._get_cpu_info_from_kstat()) == 0
+		assert len(cpuinfo._get_cpu_info_from_dmesg()) == 0
+		assert len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()) == 0
+		assert len(cpuinfo._get_cpu_info_from_ibm_pa_features()) == 0
+		assert len(cpuinfo._get_cpu_info_from_sysinfo()) == 0
+		assert len(cpuinfo._get_cpu_info_from_cpuid()) == 0
+		assert len(cpuinfo._get_cpu_info_internal()) == 17
 
 	def test_get_cpu_info_from_lscpu(self):
 		info = cpuinfo._get_cpu_info_from_lscpu()
 
-		self.assertEqual('ICT Loongson-3A R3 (Loongson-3A3000) @ 1449MHz', info['brand_raw'])
-		self.assertEqual(65536, info['l1_data_cache_size'])
-		self.assertEqual(65536, info['l1_instruction_cache_size'])
-		self.assertEqual(262144, info['l2_cache_size'])
-		self.assertEqual(2097152, info['l3_cache_size'])
+		assert info['brand_raw'] == 'ICT Loongson-3A R3 (Loongson-3A3000) @ 1449MHz'
+		assert info['l1_data_cache_size'] == 65536
+		assert info['l1_instruction_cache_size'] == 65536
+		assert info['l2_cache_size'] == 262144
+		assert info['l3_cache_size'] == 2097152
 
 	def test_get_cpu_info_from_proc_cpuinfo(self):
 		info = cpuinfo._get_cpu_info_from_proc_cpuinfo()
 
-		self.assertEqual('ICT Loongson-3A R3 (Loongson-3A3000) @ 1449MHz', info['brand_raw'])
-		self.assertEqual('1.4490 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('1.4490 GHz', info['hz_actual_friendly'])
-		self.assertEqual((1449000000, 0), info['hz_advertised'])
-		self.assertEqual((1449000000, 0), info['hz_actual'])
-		self.assertEqual(['vz'], info['flags'])
+		assert info['brand_raw'] == 'ICT Loongson-3A R3 (Loongson-3A3000) @ 1449MHz'
+		assert info['hz_advertised_friendly'] == '1.4490 GHz'
+		assert info['hz_actual_friendly'] == '1.4490 GHz'
+		assert info['hz_advertised'] == (1449000000, 0)
+		assert info['hz_actual'] == (1449000000, 0)
+		assert info['flags'] == ['vz']
 
 	def test_all(self):
 		info = cpuinfo._get_cpu_info_internal()
 
-		self.assertEqual('ICT Loongson-3A R3 (Loongson-3A3000) @ 1449MHz', info['brand_raw'])
-		self.assertEqual('MIPS_64', info['arch'])
-		self.assertEqual(64, info['bits'])
-		self.assertEqual(4, info['count'])
-		self.assertEqual('mips64', info['arch_string_raw'])
-		self.assertEqual(['vz'], info['flags'])
+		assert info['brand_raw'] == 'ICT Loongson-3A R3 (Loongson-3A3000) @ 1449MHz'
+		assert info['arch'] == 'MIPS_64'
+		assert info['bits'] == 64
+		assert info['count'] == 4
+		assert info['arch_string_raw'] == 'mips64'
+		assert info['flags'] == ['vz']

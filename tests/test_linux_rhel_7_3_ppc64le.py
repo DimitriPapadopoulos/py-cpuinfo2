@@ -332,56 +332,70 @@ class TestLinuxRHEL_7_3_ppc64le(unittest.TestCase):
 	'''
 
 	def test_returns(self):
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_registry()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpufreq_info()))
-		self.assertEqual(3, len(cpuinfo._get_cpu_info_from_lscpu()))
-		self.assertEqual(5, len(cpuinfo._get_cpu_info_from_proc_cpuinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysctl()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_kstat()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_dmesg()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()))
-		self.assertEqual(1, len(cpuinfo._get_cpu_info_from_ibm_pa_features()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpuid()))
-		self.assertEqual(15, len(cpuinfo._get_cpu_info_internal()))
+		assert len(cpuinfo._get_cpu_info_from_registry()) == 0
+		assert len(cpuinfo._get_cpu_info_from_cpufreq_info()) == 0
+		assert len(cpuinfo._get_cpu_info_from_lscpu()) == 3
+		assert len(cpuinfo._get_cpu_info_from_proc_cpuinfo()) == 5
+		assert len(cpuinfo._get_cpu_info_from_sysctl()) == 0
+		assert len(cpuinfo._get_cpu_info_from_kstat()) == 0
+		assert len(cpuinfo._get_cpu_info_from_dmesg()) == 0
+		assert len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()) == 0
+		assert len(cpuinfo._get_cpu_info_from_ibm_pa_features()) == 1
+		assert len(cpuinfo._get_cpu_info_from_sysinfo()) == 0
+		assert len(cpuinfo._get_cpu_info_from_cpuid()) == 0
+		assert len(cpuinfo._get_cpu_info_internal()) == 15
 
 	def test_get_cpu_info_from_lscpu(self):
 		info = cpuinfo._get_cpu_info_from_lscpu()
-		self.assertEqual(32 * 1024, info['l1_instruction_cache_size'])
-		self.assertEqual(64 * 1024, info['l1_data_cache_size'])
-		self.assertEqual('POWER8E (raw), altivec supported', info['brand_raw'])
+		assert info['l1_instruction_cache_size'] == (32 * 1024)
+		assert info['l1_data_cache_size'] == (64 * 1024)
+		assert info['brand_raw'] == 'POWER8E (raw), altivec supported'
 
 	def test_get_cpu_info_from_ibm_pa_features(self):
 		info = cpuinfo._get_cpu_info_from_ibm_pa_features()
-		self.assertEqual(
-			['dss_2.02', 'dss_2.05', 'dss_2.06', 'fpu', 'lsd_in_dscr', 'ppr', 'slb', 'sso_2.06', 'ugr_in_dscr'],
-			info['flags'],
-		)
+		assert info['flags'] == [
+			'dss_2.02',
+			'dss_2.05',
+			'dss_2.06',
+			'fpu',
+			'lsd_in_dscr',
+			'ppr',
+			'slb',
+			'sso_2.06',
+			'ugr_in_dscr',
+		]
 
 	def test_get_cpu_info_from_proc_cpuinfo(self):
 		info = cpuinfo._get_cpu_info_from_proc_cpuinfo()
 
-		self.assertEqual('POWER8E (raw), altivec supported', info['brand_raw'])
-		self.assertEqual('3.4250 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('3.4250 GHz', info['hz_actual_friendly'])
-		self.assertEqual((3425000000, 0), info['hz_advertised'])
-		self.assertEqual((3425000000, 0), info['hz_actual'])
+		assert info['brand_raw'] == 'POWER8E (raw), altivec supported'
+		assert info['hz_advertised_friendly'] == '3.4250 GHz'
+		assert info['hz_actual_friendly'] == '3.4250 GHz'
+		assert info['hz_advertised'] == (3425000000, 0)
+		assert info['hz_actual'] == (3425000000, 0)
 
 	def test_all(self):
 		info = cpuinfo._get_cpu_info_internal()
 
-		self.assertEqual('POWER8E (raw), altivec supported', info['brand_raw'])
-		self.assertEqual('3.4250 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('3.4250 GHz', info['hz_actual_friendly'])
-		self.assertEqual((3425000000, 0), info['hz_advertised'])
-		self.assertEqual((3425000000, 0), info['hz_actual'])
-		self.assertEqual('PPC_64', info['arch'])
-		self.assertEqual(32 * 1024, info['l1_instruction_cache_size'])
-		self.assertEqual(64 * 1024, info['l1_data_cache_size'])
-		self.assertEqual(64, info['bits'])
-		self.assertEqual(16, info['count'])
-		self.assertEqual('ppc64le', info['arch_string_raw'])
-		self.assertEqual(
-			['dss_2.02', 'dss_2.05', 'dss_2.06', 'fpu', 'lsd_in_dscr', 'ppr', 'slb', 'sso_2.06', 'ugr_in_dscr'],
-			info['flags'],
-		)
+		assert info['brand_raw'] == 'POWER8E (raw), altivec supported'
+		assert info['hz_advertised_friendly'] == '3.4250 GHz'
+		assert info['hz_actual_friendly'] == '3.4250 GHz'
+		assert info['hz_advertised'] == (3425000000, 0)
+		assert info['hz_actual'] == (3425000000, 0)
+		assert info['arch'] == 'PPC_64'
+		assert info['l1_instruction_cache_size'] == (32 * 1024)
+		assert info['l1_data_cache_size'] == (64 * 1024)
+		assert info['bits'] == 64
+		assert info['count'] == 16
+		assert info['arch_string_raw'] == 'ppc64le'
+		assert info['flags'] == [
+			'dss_2.02',
+			'dss_2.05',
+			'dss_2.06',
+			'fpu',
+			'lsd_in_dscr',
+			'ppr',
+			'slb',
+			'sso_2.06',
+			'ugr_in_dscr',
+		]

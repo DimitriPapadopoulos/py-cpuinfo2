@@ -20,14 +20,14 @@ class TestCLI(unittest.TestCase):
 		p1 = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE)
 		output = p1.communicate()[0]
 
-		self.assertEqual(0, p1.returncode)
+		assert p1.returncode == 0
 
 		output = output.decode(encoding='UTF-8')
 
 		info = json.loads(output, object_hook=cpuinfo._utf_to_str)
 
-		self.assertEqual(list(cpuinfo.CPUINFO_VERSION), info['cpuinfo_version'])
-		self.assertEqual(cpuinfo.CPUINFO_VERSION_STRING, info['cpuinfo_version_string'])
+		assert list(cpuinfo.CPUINFO_VERSION) == info['cpuinfo_version']
+		assert info['cpuinfo_version_string'] == cpuinfo.CPUINFO_VERSION_STRING
 
 	def test_version(self):
 		from subprocess import PIPE, Popen
@@ -36,12 +36,12 @@ class TestCLI(unittest.TestCase):
 		p1 = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE)
 		output = p1.communicate()[0]
 
-		self.assertEqual(0, p1.returncode)
+		assert p1.returncode == 0
 
 		output = output.decode(encoding='UTF-8')
 		output = output.strip()
 
-		self.assertEqual(cpuinfo.CPUINFO_VERSION_STRING, output)
+		assert output == cpuinfo.CPUINFO_VERSION_STRING
 
 	def test_trace(self):
 		import os
@@ -60,7 +60,7 @@ class TestCLI(unittest.TestCase):
 		command = [sys.executable, 'cpuinfo/cpuinfo.py', '--trace']
 		p1 = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE)
 		output = p1.communicate()[0]
-		self.assertEqual(0, p1.returncode)
+		assert p1.returncode == 0
 
 		# Get all log files after test
 		after_log_files = [
@@ -78,9 +78,9 @@ class TestCLI(unittest.TestCase):
 		# Remove the new log file
 		os.remove(new_log_file)
 
-		self.assertTrue(len(output) > 200)
-		self.assertTrue(output.startswith('!' * 80))
-		self.assertTrue(output.endswith('!' * 80))
+		assert len(output) > 200
+		assert output.startswith(('!' * 80))
+		assert output.endswith(('!' * 80))
 
 	def test_default(self):
 		from subprocess import PIPE, Popen
@@ -89,10 +89,10 @@ class TestCLI(unittest.TestCase):
 		p1 = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE)
 		output = p1.communicate()[0]
 
-		self.assertEqual(0, p1.returncode)
+		assert p1.returncode == 0
 
 		output = output.decode(encoding='UTF-8')
 
 		version = output.split('Cpuinfo Version: ')[1].split('\n')[0].strip()
 
-		self.assertEqual(cpuinfo.CPUINFO_VERSION_STRING, version)
+		assert version == cpuinfo.CPUINFO_VERSION_STRING

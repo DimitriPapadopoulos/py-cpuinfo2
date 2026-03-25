@@ -121,19 +121,19 @@ class TestExample(unittest.TestCase):
 		helpers.restore_data_source(cpuinfo)
 
 	def test_all(self):
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_registry())
+		assert cpuinfo._get_cpu_info_from_registry() == {}
 
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_proc_cpuinfo())
+		assert cpuinfo._get_cpu_info_from_proc_cpuinfo() == {}
 
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_sysctl())
+		assert cpuinfo._get_cpu_info_from_sysctl() == {}
 
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_kstat())
+		assert cpuinfo._get_cpu_info_from_kstat() == {}
 
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_dmesg())
+		assert cpuinfo._get_cpu_info_from_dmesg() == {}
 
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot())
+		assert cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot() == {}
 
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_sysinfo())
+		assert cpuinfo._get_cpu_info_from_sysinfo() == {}
 
 		# self.assertEqual({}, cpuinfo._get_cpu_info_from_cpuid())
 

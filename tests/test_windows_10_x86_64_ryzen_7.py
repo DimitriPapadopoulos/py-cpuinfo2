@@ -87,254 +87,245 @@ class TestWindows_10_X86_64_Ryzen7(unittest.TestCase):
 	'''
 
 	def test_returns(self):
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_wmic()))
-		self.assertEqual(7, len(cpuinfo._get_cpu_info_from_registry()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpufreq_info()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_lscpu()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_proc_cpuinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysctl()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_kstat()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_dmesg()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_ibm_pa_features()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysinfo()))
-		self.assertEqual(11, len(cpuinfo._get_cpu_info_from_cpuid()))
-		self.assertEqual(3, len(cpuinfo._get_cpu_info_from_platform_uname()))
-		self.assertEqual(20, len(cpuinfo._get_cpu_info_internal()))
+		assert len(cpuinfo._get_cpu_info_from_wmic()) == 0
+		assert len(cpuinfo._get_cpu_info_from_registry()) == 7
+		assert len(cpuinfo._get_cpu_info_from_cpufreq_info()) == 0
+		assert len(cpuinfo._get_cpu_info_from_lscpu()) == 0
+		assert len(cpuinfo._get_cpu_info_from_proc_cpuinfo()) == 0
+		assert len(cpuinfo._get_cpu_info_from_sysctl()) == 0
+		assert len(cpuinfo._get_cpu_info_from_kstat()) == 0
+		assert len(cpuinfo._get_cpu_info_from_dmesg()) == 0
+		assert len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()) == 0
+		assert len(cpuinfo._get_cpu_info_from_ibm_pa_features()) == 0
+		assert len(cpuinfo._get_cpu_info_from_sysinfo()) == 0
+		assert len(cpuinfo._get_cpu_info_from_cpuid()) == 11
+		assert len(cpuinfo._get_cpu_info_from_platform_uname()) == 3
+		assert len(cpuinfo._get_cpu_info_internal()) == 20
 
 	def test_get_cpu_info_from_cpuid(self):
 		info = cpuinfo._get_cpu_info_from_cpuid()
 
-		self.assertEqual('AuthenticAMD', info['vendor_id_raw'])
-		self.assertEqual('AMD Ryzen 7 2700X Eight-Core Processor', info['brand_raw'])
+		assert info['vendor_id_raw'] == 'AuthenticAMD'
+		assert info['brand_raw'] == 'AMD Ryzen 7 2700X Eight-Core Processor'
 		# self.assertEqual('3.6930 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('3.6930 GHz', info['hz_actual_friendly'])
+		assert info['hz_actual_friendly'] == '3.6930 GHz'
 		# self.assertEqual((3693000000, 0), info['hz_advertised'])
-		self.assertEqual((3693000000, 0), info['hz_actual'])
+		assert info['hz_actual'] == (3693000000, 0)
 
-		self.assertEqual(2, info['stepping'])
-		self.assertEqual(8, info['model'])
-		self.assertEqual(23, info['family'])
+		assert info['stepping'] == 2
+		assert info['model'] == 8
+		assert info['family'] == 23
 
-		self.assertEqual(64 * 1024, info['l2_cache_size'])
-		self.assertEqual(512, info['l2_cache_line_size'])
-		self.assertEqual(6, info['l2_cache_associativity'])
+		assert info['l2_cache_size'] == (64 * 1024)
+		assert info['l2_cache_line_size'] == 512
+		assert info['l2_cache_associativity'] == 6
 
-		self.assertEqual(
-			[
-				'3dnowprefetch',
-				'abm',
-				'adx',
-				'aes',
-				'apic',
-				'avx',
-				'avx2',
-				'bmi1',
-				'bmi2',
-				'clflush',
-				'clflushopt',
-				'cmov',
-				'cmp_legacy',
-				'cr8_legacy',
-				'cx16',
-				'cx8',
-				'dbx',
-				'de',
-				'extapic',
-				'f16c',
-				'fma',
-				'fpu',
-				'fxsr',
-				'ht',
-				'lahf_lm',
-				'lm',
-				'mca',
-				'mce',
-				'misalignsse',
-				'mmx',
-				'monitor',
-				'movbe',
-				'msr',
-				'mtrr',
-				'osvw',
-				'osxsave',
-				'pae',
-				'pat',
-				'pci_l2i',
-				'pclmulqdq',
-				'perfctr_core',
-				'perfctr_nb',
-				'pge',
-				'pni',
-				'popcnt',
-				'pse',
-				'pse36',
-				'rdrnd',
-				'rdseed',
-				'sep',
-				'sha',
-				'skinit',
-				'smap',
-				'smep',
-				'sse',
-				'sse2',
-				'sse4_1',
-				'sse4_2',
-				'sse4a',
-				'ssse3',
-				'svm',
-				'tce',
-				'topoext',
-				'tsc',
-				'vme',
-				'wdt',
-				'xsave',
-			],
-			info['flags'],
-		)
+		assert info['flags'] == [
+			'3dnowprefetch',
+			'abm',
+			'adx',
+			'aes',
+			'apic',
+			'avx',
+			'avx2',
+			'bmi1',
+			'bmi2',
+			'clflush',
+			'clflushopt',
+			'cmov',
+			'cmp_legacy',
+			'cr8_legacy',
+			'cx16',
+			'cx8',
+			'dbx',
+			'de',
+			'extapic',
+			'f16c',
+			'fma',
+			'fpu',
+			'fxsr',
+			'ht',
+			'lahf_lm',
+			'lm',
+			'mca',
+			'mce',
+			'misalignsse',
+			'mmx',
+			'monitor',
+			'movbe',
+			'msr',
+			'mtrr',
+			'osvw',
+			'osxsave',
+			'pae',
+			'pat',
+			'pci_l2i',
+			'pclmulqdq',
+			'perfctr_core',
+			'perfctr_nb',
+			'pge',
+			'pni',
+			'popcnt',
+			'pse',
+			'pse36',
+			'rdrnd',
+			'rdseed',
+			'sep',
+			'sha',
+			'skinit',
+			'smap',
+			'smep',
+			'sse',
+			'sse2',
+			'sse4_1',
+			'sse4_2',
+			'sse4a',
+			'ssse3',
+			'svm',
+			'tce',
+			'topoext',
+			'tsc',
+			'vme',
+			'wdt',
+			'xsave',
+		]
 
 	def test_get_cpu_info_from_platform_uname(self):
 		info = cpuinfo._get_cpu_info_from_platform_uname()
 
-		self.assertEqual(2, info['stepping'])
-		self.assertEqual(8, info['model'])
-		self.assertEqual(23, info['family'])
+		assert info['stepping'] == 2
+		assert info['model'] == 8
+		assert info['family'] == 23
 
 	def test_get_cpu_info_from_registry(self):
 		info = cpuinfo._get_cpu_info_from_registry()
 
-		self.assertEqual('AuthenticAMD', info['vendor_id_raw'])
-		self.assertEqual('AMD Ryzen 7 2700X Eight-Core Processor', info['brand_raw'])
-		self.assertEqual('3.6930 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('3.6930 GHz', info['hz_actual_friendly'])
-		self.assertEqual((3693000000, 0), info['hz_advertised'])
-		self.assertEqual((3693000000, 0), info['hz_actual'])
+		assert info['vendor_id_raw'] == 'AuthenticAMD'
+		assert info['brand_raw'] == 'AMD Ryzen 7 2700X Eight-Core Processor'
+		assert info['hz_advertised_friendly'] == '3.6930 GHz'
+		assert info['hz_actual_friendly'] == '3.6930 GHz'
+		assert info['hz_advertised'] == (3693000000, 0)
+		assert info['hz_actual'] == (3693000000, 0)
 
-		self.assertEqual(
-			[
-				'3dnow',
-				'clflush',
-				'cmov',
-				'de',
-				'dts',
-				'fxsr',
-				'ia64',
-				'mca',
-				'mmx',
-				'msr',
-				'mtrr',
-				'pse',
-				'sep',
-				'sepamd',
-				'serial',
-				'ss',
-				'sse',
-				'sse2',
-				'tm',
-				'tsc',
-			],
-			info['flags'],
-		)
+		assert info['flags'] == [
+			'3dnow',
+			'clflush',
+			'cmov',
+			'de',
+			'dts',
+			'fxsr',
+			'ia64',
+			'mca',
+			'mmx',
+			'msr',
+			'mtrr',
+			'pse',
+			'sep',
+			'sepamd',
+			'serial',
+			'ss',
+			'sse',
+			'sse2',
+			'tm',
+			'tsc',
+		]
 
 	def test_all(self):
 		info = cpuinfo._get_cpu_info_internal()
 
-		self.assertEqual('AuthenticAMD', info['vendor_id_raw'])
-		self.assertEqual('AMD Ryzen 7 2700X Eight-Core Processor', info['brand_raw'])
-		self.assertEqual('3.6930 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('3.6930 GHz', info['hz_actual_friendly'])
-		self.assertEqual((3693000000, 0), info['hz_advertised'])
-		self.assertEqual((3693000000, 0), info['hz_actual'])
-		self.assertEqual('X86_64', info['arch'])
-		self.assertEqual(64, info['bits'])
-		self.assertEqual(16, info['count'])
+		assert info['vendor_id_raw'] == 'AuthenticAMD'
+		assert info['brand_raw'] == 'AMD Ryzen 7 2700X Eight-Core Processor'
+		assert info['hz_advertised_friendly'] == '3.6930 GHz'
+		assert info['hz_actual_friendly'] == '3.6930 GHz'
+		assert info['hz_advertised'] == (3693000000, 0)
+		assert info['hz_actual'] == (3693000000, 0)
+		assert info['arch'] == 'X86_64'
+		assert info['bits'] == 64
+		assert info['count'] == 16
 
-		self.assertEqual('AMD64', info['arch_string_raw'])
+		assert info['arch_string_raw'] == 'AMD64'
 
-		self.assertEqual(2, info['stepping'])
-		self.assertEqual(8, info['model'])
-		self.assertEqual(23, info['family'])
+		assert info['stepping'] == 2
+		assert info['model'] == 8
+		assert info['family'] == 23
 
-		self.assertEqual(64 * 1024, info['l2_cache_size'])
-		self.assertEqual(6, info['l2_cache_associativity'])
-		self.assertEqual(512, info['l2_cache_line_size'])
+		assert info['l2_cache_size'] == (64 * 1024)
+		assert info['l2_cache_associativity'] == 6
+		assert info['l2_cache_line_size'] == 512
 
-		self.assertEqual(
-			[
-				'3dnow',
-				'3dnowprefetch',
-				'abm',
-				'adx',
-				'aes',
-				'apic',
-				'avx',
-				'avx2',
-				'bmi1',
-				'bmi2',
-				'clflush',
-				'clflushopt',
-				'cmov',
-				'cmp_legacy',
-				'cr8_legacy',
-				'cx16',
-				'cx8',
-				'dbx',
-				'de',
-				'dts',
-				'extapic',
-				'f16c',
-				'fma',
-				'fpu',
-				'fxsr',
-				'ht',
-				'ia64',
-				'lahf_lm',
-				'lm',
-				'mca',
-				'mce',
-				'misalignsse',
-				'mmx',
-				'monitor',
-				'movbe',
-				'msr',
-				'mtrr',
-				'osvw',
-				'osxsave',
-				'pae',
-				'pat',
-				'pci_l2i',
-				'pclmulqdq',
-				'perfctr_core',
-				'perfctr_nb',
-				'pge',
-				'pni',
-				'popcnt',
-				'pse',
-				'pse36',
-				'rdrnd',
-				'rdseed',
-				'sep',
-				'sepamd',
-				'serial',
-				'sha',
-				'skinit',
-				'smap',
-				'smep',
-				'ss',
-				'sse',
-				'sse2',
-				'sse4_1',
-				'sse4_2',
-				'sse4a',
-				'ssse3',
-				'svm',
-				'tce',
-				'tm',
-				'topoext',
-				'tsc',
-				'vme',
-				'wdt',
-				'xsave',
-			],
-			info['flags'],
-		)
+		assert info['flags'] == [
+			'3dnow',
+			'3dnowprefetch',
+			'abm',
+			'adx',
+			'aes',
+			'apic',
+			'avx',
+			'avx2',
+			'bmi1',
+			'bmi2',
+			'clflush',
+			'clflushopt',
+			'cmov',
+			'cmp_legacy',
+			'cr8_legacy',
+			'cx16',
+			'cx8',
+			'dbx',
+			'de',
+			'dts',
+			'extapic',
+			'f16c',
+			'fma',
+			'fpu',
+			'fxsr',
+			'ht',
+			'ia64',
+			'lahf_lm',
+			'lm',
+			'mca',
+			'mce',
+			'misalignsse',
+			'mmx',
+			'monitor',
+			'movbe',
+			'msr',
+			'mtrr',
+			'osvw',
+			'osxsave',
+			'pae',
+			'pat',
+			'pci_l2i',
+			'pclmulqdq',
+			'perfctr_core',
+			'perfctr_nb',
+			'pge',
+			'pni',
+			'popcnt',
+			'pse',
+			'pse36',
+			'rdrnd',
+			'rdseed',
+			'sep',
+			'sepamd',
+			'serial',
+			'sha',
+			'skinit',
+			'smap',
+			'smep',
+			'ss',
+			'sse',
+			'sse2',
+			'sse4_1',
+			'sse4_2',
+			'sse4a',
+			'ssse3',
+			'svm',
+			'tce',
+			'tm',
+			'topoext',
+			'tsc',
+			'vme',
+			'wdt',
+			'xsave',
+		]

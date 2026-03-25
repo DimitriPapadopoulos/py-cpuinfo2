@@ -106,261 +106,252 @@ class TestWindows_10_X86_64(unittest.TestCase):
 	'''
 
 	def test_returns(self):
-		self.assertEqual(11, len(cpuinfo._get_cpu_info_from_wmic()))
-		self.assertEqual(7, len(cpuinfo._get_cpu_info_from_registry()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpufreq_info()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_lscpu()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_proc_cpuinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysctl()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_kstat()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_dmesg()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_ibm_pa_features()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysinfo()))
-		self.assertEqual(13, len(cpuinfo._get_cpu_info_from_cpuid()))
-		self.assertEqual(3, len(cpuinfo._get_cpu_info_from_platform_uname()))
-		self.assertEqual(21, len(cpuinfo._get_cpu_info_internal()))
+		assert len(cpuinfo._get_cpu_info_from_wmic()) == 11
+		assert len(cpuinfo._get_cpu_info_from_registry()) == 7
+		assert len(cpuinfo._get_cpu_info_from_cpufreq_info()) == 0
+		assert len(cpuinfo._get_cpu_info_from_lscpu()) == 0
+		assert len(cpuinfo._get_cpu_info_from_proc_cpuinfo()) == 0
+		assert len(cpuinfo._get_cpu_info_from_sysctl()) == 0
+		assert len(cpuinfo._get_cpu_info_from_kstat()) == 0
+		assert len(cpuinfo._get_cpu_info_from_dmesg()) == 0
+		assert len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()) == 0
+		assert len(cpuinfo._get_cpu_info_from_ibm_pa_features()) == 0
+		assert len(cpuinfo._get_cpu_info_from_sysinfo()) == 0
+		assert len(cpuinfo._get_cpu_info_from_cpuid()) == 13
+		assert len(cpuinfo._get_cpu_info_from_platform_uname()) == 3
+		assert len(cpuinfo._get_cpu_info_internal()) == 21
 
 	def test_get_cpu_info_from_cpuid(self):
 		info = cpuinfo._get_cpu_info_from_cpuid()
 
-		self.assertEqual('GenuineIntel', info['vendor_id_raw'])
-		self.assertEqual('Intel(R) Core(TM) i5-4300U CPU @ 1.90GHz', info['brand_raw'])
+		assert info['vendor_id_raw'] == 'GenuineIntel'
+		assert info['brand_raw'] == 'Intel(R) Core(TM) i5-4300U CPU @ 1.90GHz'
 		# self.assertEqual('2.4940 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('2.4940 GHz', info['hz_actual_friendly'])
+		assert info['hz_actual_friendly'] == '2.4940 GHz'
 		# self.assertEqual((2494000000, 0), info['hz_advertised'])
-		self.assertEqual((2494000000, 0), info['hz_actual'])
+		assert info['hz_actual'] == (2494000000, 0)
 
-		self.assertEqual(1, info['stepping'])
-		self.assertEqual(69, info['model'])
-		self.assertEqual(6, info['family'])
+		assert info['stepping'] == 1
+		assert info['model'] == 69
+		assert info['family'] == 6
 
-		self.assertEqual(64 * 1024, info['l2_cache_size'])
-		self.assertEqual(256, info['l2_cache_line_size'])
-		self.assertEqual(6, info['l2_cache_associativity'])
+		assert info['l2_cache_size'] == (64 * 1024)
+		assert info['l2_cache_line_size'] == 256
+		assert info['l2_cache_associativity'] == 6
 
-		self.assertEqual(
-			[
-				'abm',
-				'acpi',
-				'aes',
-				'apic',
-				'avx',
-				'avx2',
-				'bmi1',
-				'bmi2',
-				'clflush',
-				'cmov',
-				'cx16',
-				'cx8',
-				'de',
-				'ds_cpl',
-				'dtes64',
-				'dts',
-				'erms',
-				'est',
-				'f16c',
-				'fma',
-				'fpu',
-				'fxsr',
-				'ht',
-				'invpcid',
-				'lahf_lm',
-				'mca',
-				'mce',
-				'mmx',
-				'monitor',
-				'movbe',
-				'msr',
-				'mtrr',
-				'osxsave',
-				'pae',
-				'pat',
-				'pbe',
-				'pcid',
-				'pclmulqdq',
-				'pdcm',
-				'pge',
-				'pni',
-				'popcnt',
-				'pse',
-				'pse36',
-				'rdrnd',
-				'sep',
-				'smep',
-				'smx',
-				'ss',
-				'sse',
-				'sse2',
-				'sse4_1',
-				'sse4_2',
-				'ssse3',
-				'tm',
-				'tm2',
-				'tsc',
-				'tscdeadline',
-				'vme',
-				'vmx',
-				'x2apic',
-				'xsave',
-				'xtpr',
-			],
-			info['flags'],
-		)
+		assert info['flags'] == [
+			'abm',
+			'acpi',
+			'aes',
+			'apic',
+			'avx',
+			'avx2',
+			'bmi1',
+			'bmi2',
+			'clflush',
+			'cmov',
+			'cx16',
+			'cx8',
+			'de',
+			'ds_cpl',
+			'dtes64',
+			'dts',
+			'erms',
+			'est',
+			'f16c',
+			'fma',
+			'fpu',
+			'fxsr',
+			'ht',
+			'invpcid',
+			'lahf_lm',
+			'mca',
+			'mce',
+			'mmx',
+			'monitor',
+			'movbe',
+			'msr',
+			'mtrr',
+			'osxsave',
+			'pae',
+			'pat',
+			'pbe',
+			'pcid',
+			'pclmulqdq',
+			'pdcm',
+			'pge',
+			'pni',
+			'popcnt',
+			'pse',
+			'pse36',
+			'rdrnd',
+			'sep',
+			'smep',
+			'smx',
+			'ss',
+			'sse',
+			'sse2',
+			'sse4_1',
+			'sse4_2',
+			'ssse3',
+			'tm',
+			'tm2',
+			'tsc',
+			'tscdeadline',
+			'vme',
+			'vmx',
+			'x2apic',
+			'xsave',
+			'xtpr',
+		]
 
 	def test_get_cpu_info_from_platform_uname(self):
 		info = cpuinfo._get_cpu_info_from_platform_uname()
 
-		self.assertEqual(1, info['stepping'])
-		self.assertEqual(69, info['model'])
-		self.assertEqual(6, info['family'])
+		assert info['stepping'] == 1
+		assert info['model'] == 69
+		assert info['family'] == 6
 
 	def test_get_cpu_info_from_wmic(self):
 		info = cpuinfo._get_cpu_info_from_wmic()
 
-		self.assertEqual('GenuineIntel', info['vendor_id_raw'])
-		self.assertEqual('Intel(R) Core(TM) i5-4300U CPU @ 1.90GHz', info['brand_raw'])
-		self.assertEqual('1.9000 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('2.4940 GHz', info['hz_actual_friendly'])
-		self.assertEqual((1900000000, 0), info['hz_advertised'])
-		self.assertEqual((2494000000, 0), info['hz_actual'])
+		assert info['vendor_id_raw'] == 'GenuineIntel'
+		assert info['brand_raw'] == 'Intel(R) Core(TM) i5-4300U CPU @ 1.90GHz'
+		assert info['hz_advertised_friendly'] == '1.9000 GHz'
+		assert info['hz_actual_friendly'] == '2.4940 GHz'
+		assert info['hz_advertised'] == (1900000000, 0)
+		assert info['hz_actual'] == (2494000000, 0)
 
-		self.assertEqual(1, info['stepping'])
-		self.assertEqual(69, info['model'])
-		self.assertEqual(6, info['family'])
+		assert info['stepping'] == 1
+		assert info['model'] == 69
+		assert info['family'] == 6
 
-		self.assertEqual(512 * 1024, info['l2_cache_size'])
-		self.assertEqual(3072 * 1024, info['l3_cache_size'])
+		assert info['l2_cache_size'] == (512 * 1024)
+		assert info['l3_cache_size'] == (3072 * 1024)
 
 	def test_get_cpu_info_from_registry(self):
 		info = cpuinfo._get_cpu_info_from_registry()
 
-		self.assertEqual('GenuineIntel', info['vendor_id_raw'])
-		self.assertEqual('Intel(R) Core(TM) i5-4300U CPU @ 1.90GHz', info['brand_raw'])
-		self.assertEqual('1.9000 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('2.4940 GHz', info['hz_actual_friendly'])
-		self.assertEqual((1900000000, 0), info['hz_advertised'])
-		self.assertEqual((2494000000, 0), info['hz_actual'])
+		assert info['vendor_id_raw'] == 'GenuineIntel'
+		assert info['brand_raw'] == 'Intel(R) Core(TM) i5-4300U CPU @ 1.90GHz'
+		assert info['hz_advertised_friendly'] == '1.9000 GHz'
+		assert info['hz_actual_friendly'] == '2.4940 GHz'
+		assert info['hz_advertised'] == (1900000000, 0)
+		assert info['hz_actual'] == (2494000000, 0)
 
-		self.assertEqual(
-			[
-				'3dnow',
-				'acpi',
-				'clflush',
-				'cmov',
-				'de',
-				'dts',
-				'fxsr',
-				'ia64',
-				'mca',
-				'mce',
-				'mmx',
-				'msr',
-				'mtrr',
-				'pse',
-				'sep',
-				'serial',
-				'ss',
-				'sse',
-				'sse2',
-				'tm',
-				'tsc',
-			],
-			info['flags'],
-		)
+		assert info['flags'] == [
+			'3dnow',
+			'acpi',
+			'clflush',
+			'cmov',
+			'de',
+			'dts',
+			'fxsr',
+			'ia64',
+			'mca',
+			'mce',
+			'mmx',
+			'msr',
+			'mtrr',
+			'pse',
+			'sep',
+			'serial',
+			'ss',
+			'sse',
+			'sse2',
+			'tm',
+			'tsc',
+		]
 
 	def test_all(self):
 		info = cpuinfo._get_cpu_info_internal()
 
-		self.assertEqual('GenuineIntel', info['vendor_id_raw'])
-		self.assertEqual('Intel(R) Core(TM) i5-4300U CPU @ 1.90GHz', info['brand_raw'])
-		self.assertEqual('1.9000 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('2.4940 GHz', info['hz_actual_friendly'])
-		self.assertEqual((1900000000, 0), info['hz_advertised'])
-		self.assertEqual((2494000000, 0), info['hz_actual'])
-		self.assertEqual('X86_64', info['arch'])
-		self.assertEqual(64, info['bits'])
-		self.assertEqual(4, info['count'])
+		assert info['vendor_id_raw'] == 'GenuineIntel'
+		assert info['brand_raw'] == 'Intel(R) Core(TM) i5-4300U CPU @ 1.90GHz'
+		assert info['hz_advertised_friendly'] == '1.9000 GHz'
+		assert info['hz_actual_friendly'] == '2.4940 GHz'
+		assert info['hz_advertised'] == (1900000000, 0)
+		assert info['hz_actual'] == (2494000000, 0)
+		assert info['arch'] == 'X86_64'
+		assert info['bits'] == 64
+		assert info['count'] == 4
 
-		self.assertEqual('AMD64', info['arch_string_raw'])
+		assert info['arch_string_raw'] == 'AMD64'
 
-		self.assertEqual(1, info['stepping'])
-		self.assertEqual(69, info['model'])
-		self.assertEqual(6, info['family'])
+		assert info['stepping'] == 1
+		assert info['model'] == 69
+		assert info['family'] == 6
 
-		self.assertEqual(512 * 1024, info['l2_cache_size'])
-		self.assertEqual(3072 * 1024, info['l3_cache_size'])
-		self.assertEqual(6, info['l2_cache_associativity'])
-		self.assertEqual(256, info['l2_cache_line_size'])
+		assert info['l2_cache_size'] == (512 * 1024)
+		assert info['l3_cache_size'] == (3072 * 1024)
+		assert info['l2_cache_associativity'] == 6
+		assert info['l2_cache_line_size'] == 256
 
-		self.assertEqual(
-			[
-				'3dnow',
-				'abm',
-				'acpi',
-				'aes',
-				'apic',
-				'avx',
-				'avx2',
-				'bmi1',
-				'bmi2',
-				'clflush',
-				'cmov',
-				'cx16',
-				'cx8',
-				'de',
-				'ds_cpl',
-				'dtes64',
-				'dts',
-				'erms',
-				'est',
-				'f16c',
-				'fma',
-				'fpu',
-				'fxsr',
-				'ht',
-				'ia64',
-				'invpcid',
-				'lahf_lm',
-				'mca',
-				'mce',
-				'mmx',
-				'monitor',
-				'movbe',
-				'msr',
-				'mtrr',
-				'osxsave',
-				'pae',
-				'pat',
-				'pbe',
-				'pcid',
-				'pclmulqdq',
-				'pdcm',
-				'pge',
-				'pni',
-				'popcnt',
-				'pse',
-				'pse36',
-				'rdrnd',
-				'sep',
-				'serial',
-				'smep',
-				'smx',
-				'ss',
-				'sse',
-				'sse2',
-				'sse4_1',
-				'sse4_2',
-				'ssse3',
-				'tm',
-				'tm2',
-				'tsc',
-				'tscdeadline',
-				'vme',
-				'vmx',
-				'x2apic',
-				'xsave',
-				'xtpr',
-			],
-			info['flags'],
-		)
+		assert info['flags'] == [
+			'3dnow',
+			'abm',
+			'acpi',
+			'aes',
+			'apic',
+			'avx',
+			'avx2',
+			'bmi1',
+			'bmi2',
+			'clflush',
+			'cmov',
+			'cx16',
+			'cx8',
+			'de',
+			'ds_cpl',
+			'dtes64',
+			'dts',
+			'erms',
+			'est',
+			'f16c',
+			'fma',
+			'fpu',
+			'fxsr',
+			'ht',
+			'ia64',
+			'invpcid',
+			'lahf_lm',
+			'mca',
+			'mce',
+			'mmx',
+			'monitor',
+			'movbe',
+			'msr',
+			'mtrr',
+			'osxsave',
+			'pae',
+			'pat',
+			'pbe',
+			'pcid',
+			'pclmulqdq',
+			'pdcm',
+			'pge',
+			'pni',
+			'popcnt',
+			'pse',
+			'pse36',
+			'rdrnd',
+			'sep',
+			'serial',
+			'smep',
+			'smx',
+			'ss',
+			'sse',
+			'sse2',
+			'sse4_1',
+			'sse4_2',
+			'ssse3',
+			'tm',
+			'tm2',
+			'tsc',
+			'tscdeadline',
+			'vme',
+			'vmx',
+			'x2apic',
+			'xsave',
+			'xtpr',
+		]

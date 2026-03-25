@@ -104,22 +104,22 @@ class TestBug152(unittest.TestCase):
 		info = cpuinfo._get_cpu_info_from_lscpu()
 
 		# Make sure fields with 0 are not filtered out
-		self.assertIn('stepping', info.keys())
-		self.assertIn('model', info.keys())
-		self.assertIn('family', info.keys())
+		assert 'stepping' in info.keys()
+		assert 'model' in info.keys()
+		assert 'family' in info.keys()
 
-		self.assertEqual(0, info['stepping'])
-		self.assertEqual(0, info['model'])
-		self.assertEqual(0, info['family'])
+		assert info['stepping'] == 0
+		assert info['model'] == 0
+		assert info['family'] == 0
 
 	def test_get_cpu_info_from_proc_cpuinfo(self):
 		info = cpuinfo._get_cpu_info_from_proc_cpuinfo()
 
 		# Make sure fields with 0 are not filtered out
-		self.assertIn('stepping', info.keys())
-		self.assertIn('model', info.keys())
-		self.assertIn('family', info.keys())
+		assert 'stepping' in info.keys()
+		assert 'model' in info.keys()
+		assert 'family' in info.keys()
 
-		self.assertEqual(0, info['stepping'])
-		self.assertEqual(0, info['model'])
-		self.assertEqual(0, info['family'])
+		assert info['stepping'] == 0
+		assert info['model'] == 0
+		assert info['family'] == 0

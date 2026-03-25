@@ -451,183 +451,177 @@ class TestLinuxDebian_8_5_X86_64(unittest.TestCase):
 	'''
 
 	def test_returns(self):
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_registry()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpufreq_info()))
-		self.assertEqual(13, len(cpuinfo._get_cpu_info_from_lscpu()))
-		self.assertEqual(11, len(cpuinfo._get_cpu_info_from_proc_cpuinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysctl()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_kstat()))
-		self.assertEqual(8, len(cpuinfo._get_cpu_info_from_dmesg()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_ibm_pa_features()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpuid()))
-		self.assertEqual(21, len(cpuinfo._get_cpu_info_internal()))
+		assert len(cpuinfo._get_cpu_info_from_registry()) == 0
+		assert len(cpuinfo._get_cpu_info_from_cpufreq_info()) == 0
+		assert len(cpuinfo._get_cpu_info_from_lscpu()) == 13
+		assert len(cpuinfo._get_cpu_info_from_proc_cpuinfo()) == 11
+		assert len(cpuinfo._get_cpu_info_from_sysctl()) == 0
+		assert len(cpuinfo._get_cpu_info_from_kstat()) == 0
+		assert len(cpuinfo._get_cpu_info_from_dmesg()) == 8
+		assert len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()) == 0
+		assert len(cpuinfo._get_cpu_info_from_ibm_pa_features()) == 0
+		assert len(cpuinfo._get_cpu_info_from_sysinfo()) == 0
+		assert len(cpuinfo._get_cpu_info_from_cpuid()) == 0
+		assert len(cpuinfo._get_cpu_info_internal()) == 21
 
 	def test_get_cpu_info_from_lscpu(self):
 		info = cpuinfo._get_cpu_info_from_lscpu()
 
-		self.assertEqual('GenuineIntel', info['vendor_id_raw'])
-		self.assertEqual('Intel(R) Pentium(R) CPU G640 @ 2.80GHz', info['brand_raw'])
-		self.assertEqual('2.7937 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('2.7937 GHz', info['hz_actual_friendly'])
-		self.assertEqual((2793652000, 0), info['hz_advertised'])
-		self.assertEqual((2793652000, 0), info['hz_actual'])
+		assert info['vendor_id_raw'] == 'GenuineIntel'
+		assert info['brand_raw'] == 'Intel(R) Pentium(R) CPU G640 @ 2.80GHz'
+		assert info['hz_advertised_friendly'] == '2.7937 GHz'
+		assert info['hz_actual_friendly'] == '2.7937 GHz'
+		assert info['hz_advertised'] == (2793652000, 0)
+		assert info['hz_actual'] == (2793652000, 0)
 
-		self.assertEqual(7, info['stepping'])
-		self.assertEqual(42, info['model'])
-		self.assertEqual(6, info['family'])
+		assert info['stepping'] == 7
+		assert info['model'] == 42
+		assert info['family'] == 6
 
-		self.assertEqual(32 * 1024, info['l1_instruction_cache_size'])
-		self.assertEqual(32 * 1024, info['l1_data_cache_size'])
+		assert info['l1_instruction_cache_size'] == (32 * 1024)
+		assert info['l1_data_cache_size'] == (32 * 1024)
 
-		self.assertEqual(256 * 1024, info['l2_cache_size'])
-		self.assertEqual(3072 * 1024, info['l3_cache_size'])
+		assert info['l2_cache_size'] == (256 * 1024)
+		assert info['l3_cache_size'] == (3072 * 1024)
 
 	def test_get_cpu_info_from_dmesg(self):
 		info = cpuinfo._get_cpu_info_from_dmesg()
 
-		self.assertEqual('Intel(R) Pentium(R) CPU G640 @ 2.80GHz', info['brand_raw'])
-		self.assertEqual('2.8000 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('2.8000 GHz', info['hz_actual_friendly'])
-		self.assertEqual((2800000000, 0), info['hz_advertised'])
-		self.assertEqual((2800000000, 0), info['hz_actual'])
+		assert info['brand_raw'] == 'Intel(R) Pentium(R) CPU G640 @ 2.80GHz'
+		assert info['hz_advertised_friendly'] == '2.8000 GHz'
+		assert info['hz_actual_friendly'] == '2.8000 GHz'
+		assert info['hz_advertised'] == (2800000000, 0)
+		assert info['hz_actual'] == (2800000000, 0)
 
-		self.assertEqual(7, info['stepping'])
-		self.assertEqual(42, info['model'])
-		self.assertEqual(6, info['family'])
+		assert info['stepping'] == 7
+		assert info['model'] == 42
+		assert info['family'] == 6
 
 	def test_get_cpu_info_from_proc_cpuinfo(self):
 		info = cpuinfo._get_cpu_info_from_proc_cpuinfo()
 
-		self.assertEqual('GenuineIntel', info['vendor_id_raw'])
-		self.assertEqual('Intel(R) Pentium(R) CPU G640 @ 2.80GHz', info['brand_raw'])
-		self.assertEqual('2.8000 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('2.7937 GHz', info['hz_actual_friendly'])
-		self.assertEqual((2800000000, 0), info['hz_advertised'])
-		self.assertEqual((2793652000, 0), info['hz_actual'])
+		assert info['vendor_id_raw'] == 'GenuineIntel'
+		assert info['brand_raw'] == 'Intel(R) Pentium(R) CPU G640 @ 2.80GHz'
+		assert info['hz_advertised_friendly'] == '2.8000 GHz'
+		assert info['hz_actual_friendly'] == '2.7937 GHz'
+		assert info['hz_advertised'] == (2800000000, 0)
+		assert info['hz_actual'] == (2793652000, 0)
 
-		self.assertEqual(3072 * 1024, info['l3_cache_size'])
+		assert info['l3_cache_size'] == (3072 * 1024)
 
-		self.assertEqual(7, info['stepping'])
-		self.assertEqual(42, info['model'])
-		self.assertEqual(6, info['family'])
-		self.assertEqual(
-			[
-				'apic',
-				'clflush',
-				'cmov',
-				'constant_tsc',
-				'cx16',
-				'cx8',
-				'de',
-				'fpu',
-				'fxsr',
-				'ht',
-				'hypervisor',
-				'lahf_lm',
-				'lm',
-				'mca',
-				'mce',
-				'mmx',
-				'msr',
-				'mtrr',
-				'nonstop_tsc',
-				'nopl',
-				'nx',
-				'pae',
-				'pat',
-				'pclmulqdq',
-				'pge',
-				'pni',
-				'popcnt',
-				'pse',
-				'pse36',
-				'rdtscp',
-				'rep_good',
-				'sep',
-				'sse',
-				'sse2',
-				'sse4_1',
-				'sse4_2',
-				'ssse3',
-				'syscall',
-				'tsc',
-				'vme',
-				'xsave',
-				'xtopology',
-			],
-			info['flags'],
-		)
+		assert info['stepping'] == 7
+		assert info['model'] == 42
+		assert info['family'] == 6
+		assert info['flags'] == [
+			'apic',
+			'clflush',
+			'cmov',
+			'constant_tsc',
+			'cx16',
+			'cx8',
+			'de',
+			'fpu',
+			'fxsr',
+			'ht',
+			'hypervisor',
+			'lahf_lm',
+			'lm',
+			'mca',
+			'mce',
+			'mmx',
+			'msr',
+			'mtrr',
+			'nonstop_tsc',
+			'nopl',
+			'nx',
+			'pae',
+			'pat',
+			'pclmulqdq',
+			'pge',
+			'pni',
+			'popcnt',
+			'pse',
+			'pse36',
+			'rdtscp',
+			'rep_good',
+			'sep',
+			'sse',
+			'sse2',
+			'sse4_1',
+			'sse4_2',
+			'ssse3',
+			'syscall',
+			'tsc',
+			'vme',
+			'xsave',
+			'xtopology',
+		]
 
 	def test_all(self):
 		info = cpuinfo._get_cpu_info_internal()
 
-		self.assertEqual('GenuineIntel', info['vendor_id_raw'])
-		self.assertEqual('Intel(R) Pentium(R) CPU G640 @ 2.80GHz', info['brand_raw'])
-		self.assertEqual('2.8000 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('2.7937 GHz', info['hz_actual_friendly'])
-		self.assertEqual((2800000000, 0), info['hz_advertised'])
-		self.assertEqual((2793652000, 0), info['hz_actual'])
-		self.assertEqual('X86_64', info['arch'])
-		self.assertEqual(64, info['bits'])
-		self.assertEqual(2, info['count'])
+		assert info['vendor_id_raw'] == 'GenuineIntel'
+		assert info['brand_raw'] == 'Intel(R) Pentium(R) CPU G640 @ 2.80GHz'
+		assert info['hz_advertised_friendly'] == '2.8000 GHz'
+		assert info['hz_actual_friendly'] == '2.7937 GHz'
+		assert info['hz_advertised'] == (2800000000, 0)
+		assert info['hz_actual'] == (2793652000, 0)
+		assert info['arch'] == 'X86_64'
+		assert info['bits'] == 64
+		assert info['count'] == 2
 
-		self.assertEqual('x86_64', info['arch_string_raw'])
+		assert info['arch_string_raw'] == 'x86_64'
 
-		self.assertEqual(32 * 1024, info['l1_instruction_cache_size'])
-		self.assertEqual(32 * 1024, info['l1_data_cache_size'])
+		assert info['l1_instruction_cache_size'] == (32 * 1024)
+		assert info['l1_data_cache_size'] == (32 * 1024)
 
-		self.assertEqual(256 * 1024, info['l2_cache_size'])
-		self.assertEqual(3072 * 1024, info['l3_cache_size'])
+		assert info['l2_cache_size'] == (256 * 1024)
+		assert info['l3_cache_size'] == (3072 * 1024)
 
-		self.assertEqual(7, info['stepping'])
-		self.assertEqual(42, info['model'])
-		self.assertEqual(6, info['family'])
-		self.assertEqual(
-			[
-				'apic',
-				'clflush',
-				'cmov',
-				'constant_tsc',
-				'cx16',
-				'cx8',
-				'de',
-				'fpu',
-				'fxsr',
-				'ht',
-				'hypervisor',
-				'lahf_lm',
-				'lm',
-				'mca',
-				'mce',
-				'mmx',
-				'msr',
-				'mtrr',
-				'nonstop_tsc',
-				'nopl',
-				'nx',
-				'pae',
-				'pat',
-				'pclmulqdq',
-				'pge',
-				'pni',
-				'popcnt',
-				'pse',
-				'pse36',
-				'rdtscp',
-				'rep_good',
-				'sep',
-				'sse',
-				'sse2',
-				'sse4_1',
-				'sse4_2',
-				'ssse3',
-				'syscall',
-				'tsc',
-				'vme',
-				'xsave',
-				'xtopology',
-			],
-			info['flags'],
-		)
+		assert info['stepping'] == 7
+		assert info['model'] == 42
+		assert info['family'] == 6
+		assert info['flags'] == [
+			'apic',
+			'clflush',
+			'cmov',
+			'constant_tsc',
+			'cx16',
+			'cx8',
+			'de',
+			'fpu',
+			'fxsr',
+			'ht',
+			'hypervisor',
+			'lahf_lm',
+			'lm',
+			'mca',
+			'mce',
+			'mmx',
+			'msr',
+			'mtrr',
+			'nonstop_tsc',
+			'nopl',
+			'nx',
+			'pae',
+			'pat',
+			'pclmulqdq',
+			'pge',
+			'pni',
+			'popcnt',
+			'pse',
+			'pse36',
+			'rdtscp',
+			'rep_good',
+			'sep',
+			'sse',
+			'sse2',
+			'sse4_1',
+			'sse4_2',
+			'ssse3',
+			'syscall',
+			'tsc',
+			'vme',
+			'xsave',
+			'xtopology',
+		]

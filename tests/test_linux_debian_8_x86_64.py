@@ -64,128 +64,122 @@ class TestLinuxDebian_8_X86_64(unittest.TestCase):
 	'''
 
 	def test_returns(self):
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_registry()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpufreq_info()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_lscpu()))
-		self.assertEqual(11, len(cpuinfo._get_cpu_info_from_proc_cpuinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysctl()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_kstat()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_dmesg()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_ibm_pa_features()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpuid()))
-		self.assertEqual(18, len(cpuinfo._get_cpu_info_internal()))
+		assert len(cpuinfo._get_cpu_info_from_registry()) == 0
+		assert len(cpuinfo._get_cpu_info_from_cpufreq_info()) == 0
+		assert len(cpuinfo._get_cpu_info_from_lscpu()) == 0
+		assert len(cpuinfo._get_cpu_info_from_proc_cpuinfo()) == 11
+		assert len(cpuinfo._get_cpu_info_from_sysctl()) == 0
+		assert len(cpuinfo._get_cpu_info_from_kstat()) == 0
+		assert len(cpuinfo._get_cpu_info_from_dmesg()) == 0
+		assert len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()) == 0
+		assert len(cpuinfo._get_cpu_info_from_ibm_pa_features()) == 0
+		assert len(cpuinfo._get_cpu_info_from_sysinfo()) == 0
+		assert len(cpuinfo._get_cpu_info_from_cpuid()) == 0
+		assert len(cpuinfo._get_cpu_info_internal()) == 18
 
 	def test_get_cpu_info_from_proc_cpuinfo(self):
 		info = cpuinfo._get_cpu_info_from_proc_cpuinfo()
 
-		self.assertEqual('GenuineIntel', info['vendor_id_raw'])
-		self.assertEqual('Intel(R) Core(TM) i7 CPU         870  @ 2.93GHz', info['brand_raw'])
-		self.assertEqual('2.9300 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('2.9283 GHz', info['hz_actual_friendly'])
-		self.assertEqual((2930000000, 0), info['hz_advertised'])
-		self.assertEqual((2928283000, 0), info['hz_actual'])
+		assert info['vendor_id_raw'] == 'GenuineIntel'
+		assert info['brand_raw'] == 'Intel(R) Core(TM) i7 CPU         870  @ 2.93GHz'
+		assert info['hz_advertised_friendly'] == '2.9300 GHz'
+		assert info['hz_actual_friendly'] == '2.9283 GHz'
+		assert info['hz_advertised'] == (2930000000, 0)
+		assert info['hz_actual'] == (2928283000, 0)
 
-		self.assertEqual(6144 * 1024, info['l3_cache_size'])
+		assert info['l3_cache_size'] == (6144 * 1024)
 
-		self.assertEqual(5, info['stepping'])
-		self.assertEqual(30, info['model'])
-		self.assertEqual(6, info['family'])
-		self.assertEqual(
-			[
-				'apic',
-				'clflush',
-				'cmov',
-				'constant_tsc',
-				'cx8',
-				'de',
-				'fpu',
-				'fxsr',
-				'ht',
-				'lahf_lm',
-				'lm',
-				'mca',
-				'mce',
-				'mmx',
-				'msr',
-				'mtrr',
-				'nopl',
-				'nx',
-				'pae',
-				'pat',
-				'pge',
-				'pni',
-				'pse',
-				'pse36',
-				'rdtscp',
-				'rep_good',
-				'sep',
-				'sse',
-				'sse2',
-				'ssse3',
-				'syscall',
-				'tsc',
-				'vme',
-			],
-			info['flags'],
-		)
+		assert info['stepping'] == 5
+		assert info['model'] == 30
+		assert info['family'] == 6
+		assert info['flags'] == [
+			'apic',
+			'clflush',
+			'cmov',
+			'constant_tsc',
+			'cx8',
+			'de',
+			'fpu',
+			'fxsr',
+			'ht',
+			'lahf_lm',
+			'lm',
+			'mca',
+			'mce',
+			'mmx',
+			'msr',
+			'mtrr',
+			'nopl',
+			'nx',
+			'pae',
+			'pat',
+			'pge',
+			'pni',
+			'pse',
+			'pse36',
+			'rdtscp',
+			'rep_good',
+			'sep',
+			'sse',
+			'sse2',
+			'ssse3',
+			'syscall',
+			'tsc',
+			'vme',
+		]
 
 	def test_all(self):
 		info = cpuinfo._get_cpu_info_internal()
 
-		self.assertEqual('GenuineIntel', info['vendor_id_raw'])
-		self.assertEqual('Intel(R) Core(TM) i7 CPU         870  @ 2.93GHz', info['brand_raw'])
-		self.assertEqual('2.9300 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('2.9283 GHz', info['hz_actual_friendly'])
-		self.assertEqual((2930000000, 0), info['hz_advertised'])
-		self.assertEqual((2928283000, 0), info['hz_actual'])
-		self.assertEqual('X86_64', info['arch'])
-		self.assertEqual(64, info['bits'])
-		self.assertEqual(1, info['count'])
+		assert info['vendor_id_raw'] == 'GenuineIntel'
+		assert info['brand_raw'] == 'Intel(R) Core(TM) i7 CPU         870  @ 2.93GHz'
+		assert info['hz_advertised_friendly'] == '2.9300 GHz'
+		assert info['hz_actual_friendly'] == '2.9283 GHz'
+		assert info['hz_advertised'] == (2930000000, 0)
+		assert info['hz_actual'] == (2928283000, 0)
+		assert info['arch'] == 'X86_64'
+		assert info['bits'] == 64
+		assert info['count'] == 1
 
-		self.assertEqual('x86_64', info['arch_string_raw'])
+		assert info['arch_string_raw'] == 'x86_64'
 
-		self.assertEqual(6144 * 1024, info['l3_cache_size'])
+		assert info['l3_cache_size'] == (6144 * 1024)
 
-		self.assertEqual(5, info['stepping'])
-		self.assertEqual(30, info['model'])
-		self.assertEqual(6, info['family'])
-		self.assertEqual(
-			[
-				'apic',
-				'clflush',
-				'cmov',
-				'constant_tsc',
-				'cx8',
-				'de',
-				'fpu',
-				'fxsr',
-				'ht',
-				'lahf_lm',
-				'lm',
-				'mca',
-				'mce',
-				'mmx',
-				'msr',
-				'mtrr',
-				'nopl',
-				'nx',
-				'pae',
-				'pat',
-				'pge',
-				'pni',
-				'pse',
-				'pse36',
-				'rdtscp',
-				'rep_good',
-				'sep',
-				'sse',
-				'sse2',
-				'ssse3',
-				'syscall',
-				'tsc',
-				'vme',
-			],
-			info['flags'],
-		)
+		assert info['stepping'] == 5
+		assert info['model'] == 30
+		assert info['family'] == 6
+		assert info['flags'] == [
+			'apic',
+			'clflush',
+			'cmov',
+			'constant_tsc',
+			'cx8',
+			'de',
+			'fpu',
+			'fxsr',
+			'ht',
+			'lahf_lm',
+			'lm',
+			'mca',
+			'mce',
+			'mmx',
+			'msr',
+			'mtrr',
+			'nopl',
+			'nx',
+			'pae',
+			'pat',
+			'pge',
+			'pni',
+			'pse',
+			'pse36',
+			'rdtscp',
+			'rep_good',
+			'sep',
+			'sse',
+			'sse2',
+			'ssse3',
+			'syscall',
+			'tsc',
+			'vme',
+		]
