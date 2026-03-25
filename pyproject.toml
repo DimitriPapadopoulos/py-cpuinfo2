@@ -33,7 +33,6 @@ include = [
     "/cpuinfo",
     "/tests",
     "ChangeLog",
-    "test_suite.py",
 ]
 
 [tool.hatch.build.targets.wheel]
