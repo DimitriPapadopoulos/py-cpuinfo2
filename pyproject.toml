@@ -44,5 +44,25 @@ include = [
 dev = [
     "pytest>=8.4.2",
     "pytest-cov>=7.1.0",
+    "ruff>=0.15.7",
 ]
 
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I",
+    "UP",
+]
+ignore = [
+    "E501",
+    "UP030",
+    "UP032",
+]
+
+[tool.ruff.format]
+indent-style = "tab"
+quote-style = "preserve"
