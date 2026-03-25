@@ -1,8 +1,7 @@
+import pytest
 
-
-import unittest
-from cpuinfo import *
-import helpers
+from cpuinfo import cpuinfo
+from tests import helpers
 
 
 class MockDataSource:
@@ -90,36 +89,37 @@ Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca 
 '''
 		return returncode, output
 
+
 # Confirms fix for: https://github.com/workhorsy/py-cpuinfo/issues/152
 # CPU stepping, model, and family values are blank if 0
-class TestBug152(unittest.TestCase):
-	def setUp(self):
-		helpers.backup_data_source(cpuinfo)
-		helpers.monkey_patch_data_source(cpuinfo, MockDataSource)
 
-	def tearDown(self):
-		helpers.restore_data_source(cpuinfo)
 
-	def test_get_cpu_info_from_lscpu(self):
-		info = cpuinfo._get_cpu_info_from_lscpu()
+@pytest.fixture(autouse=True)
+def _setup(monkeypatch):
+	helpers.monkey_patch_data_source(cpuinfo, MockDataSource, monkeypatch)
 
-		# Make sure fields with 0 are not filtered out
-		self.assertIn('stepping', info.keys())
-		self.assertIn('model', info.keys())
-		self.assertIn('family', info.keys())
 
-		self.assertEqual(0, info['stepping'])
-		self.assertEqual(0, info['model'])
-		self.assertEqual(0, info['family'])
+def test_get_cpu_info_from_lscpu():
+	info = cpuinfo._get_cpu_info_from_lscpu()
 
-	def test_get_cpu_info_from_proc_cpuinfo(self):
-		info = cpuinfo._get_cpu_info_from_proc_cpuinfo()
+	# Make sure fields with 0 are not filtered out
+	assert 'stepping' in info.keys()
+	assert 'model' in info.keys()
+	assert 'family' in info.keys()
 
-		# Make sure fields with 0 are not filtered out
-		self.assertIn('stepping', info.keys())
-		self.assertIn('model', info.keys())
-		self.assertIn('family', info.keys())
+	assert info['stepping'] == 0
+	assert info['model'] == 0
+	assert info['family'] == 0
 
-		self.assertEqual(0, info['stepping'])
-		self.assertEqual(0, info['model'])
-		self.assertEqual(0, info['family'])
+
+def test_get_cpu_info_from_proc_cpuinfo():
+	info = cpuinfo._get_cpu_info_from_proc_cpuinfo()
+
+	# Make sure fields with 0 are not filtered out
+	assert 'stepping' in info.keys()
+	assert 'model' in info.keys()
+	assert 'family' in info.keys()
+
+	assert info['stepping'] == 0
+	assert info['model'] == 0
+	assert info['family'] == 0

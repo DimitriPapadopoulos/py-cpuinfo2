@@ -1,8 +1,7 @@
+import pytest
 
-
-import unittest
-from cpuinfo import *
-import helpers
+from cpuinfo import cpuinfo
+from tests import helpers
 
 
 class MockDataSource:
@@ -34,152 +33,294 @@ class MockDataSource:
 		return 1010515455
 
 
+@pytest.fixture(autouse=True)
+def _setup(monkeypatch):
+	monkeypatch.setattr(cpuinfo, "CAN_CALL_CPUID_IN_SUBPROCESS", False)
+	helpers.monkey_patch_data_source(cpuinfo, MockDataSource, monkeypatch)
 
-
-class TestWindows_10_X86_64_Ryzen7(unittest.TestCase):
-	def setUp(self):
-		cpuinfo.CAN_CALL_CPUID_IN_SUBPROCESS = False
-		helpers.backup_data_source(cpuinfo)
-		helpers.monkey_patch_data_source(cpuinfo, MockDataSource)
-
-		helpers.backup_cpuid(cpuinfo)
-		helpers.monkey_patch_cpuid(cpuinfo, 3693000000, [
+	helpers.monkey_patch_cpuid(
+		cpuinfo,
+		3693000000,
+		[
 			# get_max_extension_support
-			0x8000001f,
+			0x8000001F,
 			# get_cache
 			0x2006140,
 			# get_info
-			0x800f82,
+			0x800F82,
 			# get_processor_brand
-			0x20444d41, 0x657a7952, 0x2037206e,
-			0x30303732, 0x69452058, 0x2d746867,
-			0x65726f43, 0x6f725020, 0x73736563,
-			0x2020726f, 0x20202020, 0x202020,
+			0x20444D41,
+			0x657A7952,
+			0x2037206E,
+			0x30303732,
+			0x69452058,
+			0x2D746867,
+			0x65726F43,
+			0x6F725020,
+			0x73736563,
+			0x2020726F,
+			0x20202020,
+			0x202020,
 			# get_vendor_id
-			0x68747541, 0x444d4163, 0x69746e65,
+			0x68747541,
+			0x444D4163,
+			0x69746E65,
 			# get_flags
-			0x178bfbff, 0x7ed8320b, 0x209c01a9,
-			0x0, 0x20000000, 0x35c233ff,
-		])
-
-	def tearDown(self):
-		helpers.restore_data_source(cpuinfo)
-		helpers.restore_cpuid(cpuinfo)
-		cpuinfo.CAN_CALL_CPUID_IN_SUBPROCESS = True
-
-	'''
-	Make sure calls return the expected number of fields.
-	'''
-	def test_returns(self):
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_wmic()));
-		self.assertEqual(7, len(cpuinfo._get_cpu_info_from_registry()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpufreq_info()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_lscpu()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_proc_cpuinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysctl()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_kstat()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_dmesg()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_ibm_pa_features()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysinfo()))
-		self.assertEqual(11, len(cpuinfo._get_cpu_info_from_cpuid()))
-		self.assertEqual(3, len(cpuinfo._get_cpu_info_from_platform_uname()))
-		self.assertEqual(20, len(cpuinfo._get_cpu_info_internal()))
+			0x178BFBFF,
+			0x7ED8320B,
+			0x209C01A9,
+			0x0,
+			0x20000000,
+			0x35C233FF,
+		],
+		monkeypatch=monkeypatch,
+	)
 
 
-	def test_get_cpu_info_from_cpuid(self):
-		info = cpuinfo._get_cpu_info_from_cpuid()
+def test_returns():
+	assert len(cpuinfo._get_cpu_info_from_wmic()) == 0
+	assert len(cpuinfo._get_cpu_info_from_registry()) == 7
+	assert len(cpuinfo._get_cpu_info_from_cpufreq_info()) == 0
+	assert len(cpuinfo._get_cpu_info_from_lscpu()) == 0
+	assert len(cpuinfo._get_cpu_info_from_proc_cpuinfo()) == 0
+	assert len(cpuinfo._get_cpu_info_from_sysctl()) == 0
+	assert len(cpuinfo._get_cpu_info_from_kstat()) == 0
+	assert len(cpuinfo._get_cpu_info_from_dmesg()) == 0
+	assert len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()) == 0
+	assert len(cpuinfo._get_cpu_info_from_ibm_pa_features()) == 0
+	assert len(cpuinfo._get_cpu_info_from_sysinfo()) == 0
+	assert len(cpuinfo._get_cpu_info_from_cpuid()) == 11
+	assert len(cpuinfo._get_cpu_info_from_platform_uname()) == 3
+	assert len(cpuinfo._get_cpu_info_internal()) == 20
 
-		self.assertEqual('AuthenticAMD', info['vendor_id_raw'])
-		self.assertEqual('AMD Ryzen 7 2700X Eight-Core Processor', info['brand_raw'])
-		#self.assertEqual('3.6930 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('3.6930 GHz', info['hz_actual_friendly'])
-		#self.assertEqual((3693000000, 0), info['hz_advertised'])
-		self.assertEqual((3693000000, 0), info['hz_actual'])
 
-		self.assertEqual(2, info['stepping'])
-		self.assertEqual(8, info['model'])
-		self.assertEqual(23, info['family'])
+def test_get_cpu_info_from_cpuid():
+	info = cpuinfo._get_cpu_info_from_cpuid()
 
-		self.assertEqual(64 * 1024, info['l2_cache_size'])
-		self.assertEqual(512, info['l2_cache_line_size'])
-		self.assertEqual(6, info['l2_cache_associativity'])
+	assert info['vendor_id_raw'] == 'AuthenticAMD'
+	assert info['brand_raw'] == 'AMD Ryzen 7 2700X Eight-Core Processor'
+	# self.assertEqual('3.6930 GHz', info['hz_advertised_friendly'])
+	assert info['hz_actual_friendly'] == '3.6930 GHz'
+	# self.assertEqual((3693000000, 0), info['hz_advertised'])
+	assert info['hz_actual'] == (3693000000, 0)
 
-		self.assertEqual(
-			['3dnowprefetch', 'abm', 'adx', 'aes', 'apic', 'avx', 'avx2',
-			'bmi1', 'bmi2', 'clflush', 'clflushopt', 'cmov', 'cmp_legacy',
-			'cr8_legacy', 'cx16', 'cx8', 'dbx', 'de', 'extapic', 'f16c',
-			'fma', 'fpu', 'fxsr', 'ht', 'lahf_lm', 'lm', 'mca', 'mce',
-			'misalignsse', 'mmx', 'monitor', 'movbe', 'msr', 'mtrr', 'osvw',
-			'osxsave', 'pae', 'pat', 'pci_l2i', 'pclmulqdq', 'perfctr_core',
-			'perfctr_nb', 'pge', 'pni', 'popcnt', 'pse', 'pse36', 'rdrnd',
-			'rdseed', 'sep', 'sha', 'skinit', 'smap', 'smep', 'sse', 'sse2',
-			'sse4_1', 'sse4_2', 'sse4a', 'ssse3', 'svm', 'tce', 'topoext',
-			'tsc', 'vme', 'wdt', 'xsave']
-			,
-			info['flags']
-		)
+	assert info['stepping'] == 2
+	assert info['model'] == 8
+	assert info['family'] == 23
 
-	def test_get_cpu_info_from_platform_uname(self):
-		info = cpuinfo._get_cpu_info_from_platform_uname()
+	assert info['l2_cache_size'] == (64 * 1024)
+	assert info['l2_cache_line_size'] == 512
+	assert info['l2_cache_associativity'] == 6
 
-		self.assertEqual(2, info['stepping'])
-		self.assertEqual(8, info['model'])
-		self.assertEqual(23, info['family'])
+	assert info['flags'] == [
+		'3dnowprefetch',
+		'abm',
+		'adx',
+		'aes',
+		'apic',
+		'avx',
+		'avx2',
+		'bmi1',
+		'bmi2',
+		'clflush',
+		'clflushopt',
+		'cmov',
+		'cmp_legacy',
+		'cr8_legacy',
+		'cx16',
+		'cx8',
+		'dbx',
+		'de',
+		'extapic',
+		'f16c',
+		'fma',
+		'fpu',
+		'fxsr',
+		'ht',
+		'lahf_lm',
+		'lm',
+		'mca',
+		'mce',
+		'misalignsse',
+		'mmx',
+		'monitor',
+		'movbe',
+		'msr',
+		'mtrr',
+		'osvw',
+		'osxsave',
+		'pae',
+		'pat',
+		'pci_l2i',
+		'pclmulqdq',
+		'perfctr_core',
+		'perfctr_nb',
+		'pge',
+		'pni',
+		'popcnt',
+		'pse',
+		'pse36',
+		'rdrnd',
+		'rdseed',
+		'sep',
+		'sha',
+		'skinit',
+		'smap',
+		'smep',
+		'sse',
+		'sse2',
+		'sse4_1',
+		'sse4_2',
+		'sse4a',
+		'ssse3',
+		'svm',
+		'tce',
+		'topoext',
+		'tsc',
+		'vme',
+		'wdt',
+		'xsave',
+	]
 
-	def test_get_cpu_info_from_registry(self):
-		info = cpuinfo._get_cpu_info_from_registry()
 
-		self.assertEqual('AuthenticAMD', info['vendor_id_raw'])
-		self.assertEqual('AMD Ryzen 7 2700X Eight-Core Processor', info['brand_raw'])
-		self.assertEqual('3.6930 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('3.6930 GHz', info['hz_actual_friendly'])
-		self.assertEqual((3693000000, 0), info['hz_advertised'])
-		self.assertEqual((3693000000, 0), info['hz_actual'])
+def test_get_cpu_info_from_platform_uname():
+	info = cpuinfo._get_cpu_info_from_platform_uname()
 
-		self.assertEqual(
-			['3dnow', 'clflush', 'cmov', 'de', 'dts', 'fxsr', 'ia64', 'mca',
-			'mmx', 'msr', 'mtrr', 'pse', 'sep', 'sepamd', 'serial', 'ss',
-			'sse', 'sse2', 'tm', 'tsc']
-			,
-			info['flags']
-		)
+	assert info['stepping'] == 2
+	assert info['model'] == 8
+	assert info['family'] == 23
 
-	def test_all(self):
-		info = cpuinfo._get_cpu_info_internal()
 
-		self.assertEqual('AuthenticAMD', info['vendor_id_raw'])
-		self.assertEqual('AMD Ryzen 7 2700X Eight-Core Processor', info['brand_raw'])
-		self.assertEqual('3.6930 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('3.6930 GHz', info['hz_actual_friendly'])
-		self.assertEqual((3693000000, 0), info['hz_advertised'])
-		self.assertEqual((3693000000, 0), info['hz_actual'])
-		self.assertEqual('X86_64', info['arch'])
-		self.assertEqual(64, info['bits'])
-		self.assertEqual(16, info['count'])
+def test_get_cpu_info_from_registry():
+	info = cpuinfo._get_cpu_info_from_registry()
 
-		self.assertEqual('AMD64', info['arch_string_raw'])
+	assert info['vendor_id_raw'] == 'AuthenticAMD'
+	assert info['brand_raw'] == 'AMD Ryzen 7 2700X Eight-Core Processor'
+	assert info['hz_advertised_friendly'] == '3.6930 GHz'
+	assert info['hz_actual_friendly'] == '3.6930 GHz'
+	assert info['hz_advertised'] == (3693000000, 0)
+	assert info['hz_actual'] == (3693000000, 0)
 
-		self.assertEqual(2, info['stepping'])
-		self.assertEqual(8, info['model'])
-		self.assertEqual(23, info['family'])
+	assert info['flags'] == [
+		'3dnow',
+		'clflush',
+		'cmov',
+		'de',
+		'dts',
+		'fxsr',
+		'ia64',
+		'mca',
+		'mmx',
+		'msr',
+		'mtrr',
+		'pse',
+		'sep',
+		'sepamd',
+		'serial',
+		'ss',
+		'sse',
+		'sse2',
+		'tm',
+		'tsc',
+	]
 
-		self.assertEqual(64 * 1024, info['l2_cache_size'])
-		self.assertEqual(6, info['l2_cache_associativity'])
-		self.assertEqual(512, info['l2_cache_line_size'])
 
-		self.assertEqual(
-			['3dnow', '3dnowprefetch', 'abm', 'adx', 'aes', 'apic', 'avx',
-			'avx2', 'bmi1', 'bmi2', 'clflush', 'clflushopt', 'cmov',
-			'cmp_legacy', 'cr8_legacy', 'cx16', 'cx8', 'dbx', 'de', 'dts',
-			'extapic', 'f16c', 'fma', 'fpu', 'fxsr', 'ht', 'ia64', 'lahf_lm',
-			'lm', 'mca', 'mce', 'misalignsse', 'mmx', 'monitor', 'movbe',
-			'msr', 'mtrr', 'osvw', 'osxsave', 'pae', 'pat', 'pci_l2i',
-			'pclmulqdq', 'perfctr_core', 'perfctr_nb', 'pge', 'pni',
-			'popcnt', 'pse', 'pse36', 'rdrnd', 'rdseed', 'sep', 'sepamd',
-			'serial', 'sha', 'skinit', 'smap', 'smep', 'ss', 'sse', 'sse2',
-			'sse4_1', 'sse4_2', 'sse4a', 'ssse3', 'svm', 'tce', 'tm',
-			'topoext', 'tsc', 'vme', 'wdt', 'xsave']
-			,
-			info['flags']
-		)
+def test_all():
+	info = cpuinfo._get_cpu_info_internal()
+
+	assert info['vendor_id_raw'] == 'AuthenticAMD'
+	assert info['brand_raw'] == 'AMD Ryzen 7 2700X Eight-Core Processor'
+	assert info['hz_advertised_friendly'] == '3.6930 GHz'
+	assert info['hz_actual_friendly'] == '3.6930 GHz'
+	assert info['hz_advertised'] == (3693000000, 0)
+	assert info['hz_actual'] == (3693000000, 0)
+	assert info['arch'] == 'X86_64'
+	assert info['bits'] == 64
+	assert info['count'] == 16
+
+	assert info['arch_string_raw'] == 'AMD64'
+
+	assert info['stepping'] == 2
+	assert info['model'] == 8
+	assert info['family'] == 23
+
+	assert info['l2_cache_size'] == (64 * 1024)
+	assert info['l2_cache_associativity'] == 6
+	assert info['l2_cache_line_size'] == 512
+
+	assert info['flags'] == [
+		'3dnow',
+		'3dnowprefetch',
+		'abm',
+		'adx',
+		'aes',
+		'apic',
+		'avx',
+		'avx2',
+		'bmi1',
+		'bmi2',
+		'clflush',
+		'clflushopt',
+		'cmov',
+		'cmp_legacy',
+		'cr8_legacy',
+		'cx16',
+		'cx8',
+		'dbx',
+		'de',
+		'dts',
+		'extapic',
+		'f16c',
+		'fma',
+		'fpu',
+		'fxsr',
+		'ht',
+		'ia64',
+		'lahf_lm',
+		'lm',
+		'mca',
+		'mce',
+		'misalignsse',
+		'mmx',
+		'monitor',
+		'movbe',
+		'msr',
+		'mtrr',
+		'osvw',
+		'osxsave',
+		'pae',
+		'pat',
+		'pci_l2i',
+		'pclmulqdq',
+		'perfctr_core',
+		'perfctr_nb',
+		'pge',
+		'pni',
+		'popcnt',
+		'pse',
+		'pse36',
+		'rdrnd',
+		'rdseed',
+		'sep',
+		'sepamd',
+		'serial',
+		'sha',
+		'skinit',
+		'smap',
+		'smep',
+		'ss',
+		'sse',
+		'sse2',
+		'sse4_1',
+		'sse4_2',
+		'sse4a',
+		'ssse3',
+		'svm',
+		'tce',
+		'tm',
+		'topoext',
+		'tsc',
+		'vme',
+		'wdt',
+		'xsave',
+	]

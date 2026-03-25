@@ -1,8 +1,7 @@
+import pytest
 
-
-import unittest
-from cpuinfo import *
-import helpers
+from cpuinfo import cpuinfo
+from tests import helpers
 
 
 class MockDataSource:
@@ -65,7 +64,6 @@ class MockDataSource:
 	def dmesg_a():
 		return 0, ""
 
-
 	@staticmethod
 	def cat_var_run_dmesg_boot():
 		return 0, ""
@@ -107,45 +105,30 @@ class MockDataSource:
 		return {}
 
 
-class TestParseErrors(unittest.TestCase):
-	def setUp(self):
-		helpers.backup_data_source(cpuinfo)
-		helpers.monkey_patch_data_source(cpuinfo, MockDataSource)
+@pytest.fixture(autouse=True)
+def _setup(monkeypatch):
+	helpers.monkey_patch_data_source(cpuinfo, MockDataSource, monkeypatch)
 
-	def tearDown(self):
-		helpers.restore_data_source(cpuinfo)
 
-	'''
-	Make sure calls return the expected number of fields.
-	'''
-	def test_returns(self):
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_registry()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpufreq_info()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_lscpu()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_proc_cpuinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysctl()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_kstat()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_dmesg()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_ibm_pa_features()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpuid()))
+def test_returns():
+	assert len(cpuinfo._get_cpu_info_from_registry()) == 0
+	assert len(cpuinfo._get_cpu_info_from_cpufreq_info()) == 0
+	assert len(cpuinfo._get_cpu_info_from_lscpu()) == 0
+	assert len(cpuinfo._get_cpu_info_from_proc_cpuinfo()) == 0
+	assert len(cpuinfo._get_cpu_info_from_sysctl()) == 0
+	assert len(cpuinfo._get_cpu_info_from_kstat()) == 0
+	assert len(cpuinfo._get_cpu_info_from_dmesg()) == 0
+	assert len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()) == 0
+	assert len(cpuinfo._get_cpu_info_from_ibm_pa_features()) == 0
+	assert len(cpuinfo._get_cpu_info_from_sysinfo()) == 0
+	assert len(cpuinfo._get_cpu_info_from_cpuid()) == 0
 
-	def test_all(self):
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_registry())
 
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_proc_cpuinfo())
-
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_sysctl())
-
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_kstat())
-
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_dmesg())
-
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot())
-
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_sysinfo())
-
-		#self.assertEqual({}, cpuinfo._get_cpu_info_from_cpuid())
-
-		#self.assertEqual({}, cpuinfo._get_cpu_info_internal())
+def test_all():
+	assert cpuinfo._get_cpu_info_from_registry() == {}
+	assert cpuinfo._get_cpu_info_from_proc_cpuinfo() == {}
+	assert cpuinfo._get_cpu_info_from_sysctl() == {}
+	assert cpuinfo._get_cpu_info_from_kstat() == {}
+	assert cpuinfo._get_cpu_info_from_dmesg() == {}
+	assert cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot() == {}
+	assert cpuinfo._get_cpu_info_from_sysinfo() == {}

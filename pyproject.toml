@@ -33,7 +33,6 @@ include = [
     "/cpuinfo",
     "/tests",
     "ChangeLog",
-    "test_suite.py",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -45,5 +44,36 @@ include = [
 dev = [
     "pytest>=8.4.2",
     "pytest-cov>=7.1.0",
+    "ruff>=0.15.7",
 ]
 
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I",
+    "UP",
+]
+ignore = [
+    "E501",
+    "UP030",
+    "UP032",
+]
+
+[tool.ruff.format]
+indent-style = "tab"
+quote-style = "preserve"
+
+[tool.coverage.report]
+exclude_also = [
+    "def __repr__",
+    "if self\\.debug",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "@(abc\\.)?abstractmethod",
+]

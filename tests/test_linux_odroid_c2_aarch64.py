@@ -1,8 +1,7 @@
+import pytest
 
-
-import unittest
-from cpuinfo import *
-import helpers
+from cpuinfo import cpuinfo
+from tests import helpers
 
 
 class MockDataSource:
@@ -151,72 +150,64 @@ analyzing CPU 3:
 		return returncode, output
 
 
-class TestLinux_Odroid_C2_Aarch_64(unittest.TestCase):
-	def setUp(self):
-		helpers.backup_data_source(cpuinfo)
-		helpers.monkey_patch_data_source(cpuinfo, MockDataSource)
+@pytest.fixture(autouse=True)
+def _setup(monkeypatch):
+	helpers.monkey_patch_data_source(cpuinfo, MockDataSource, monkeypatch)
 
-	def tearDown(self):
-		helpers.restore_data_source(cpuinfo)
 
-	'''
-	Make sure calls return the expected number of fields.
-	'''
-	def test_returns(self):
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_registry()))
-		self.assertEqual(4, len(cpuinfo._get_cpu_info_from_cpufreq_info()))
-		self.assertEqual(4, len(cpuinfo._get_cpu_info_from_lscpu()))
-		self.assertEqual(2, len(cpuinfo._get_cpu_info_from_proc_cpuinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysctl()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_kstat()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_dmesg()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_ibm_pa_features()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpuid()))
-		self.assertEqual(13, len(cpuinfo._get_cpu_info_internal()))
+def test_returns():
+	assert len(cpuinfo._get_cpu_info_from_registry()) == 0
+	assert len(cpuinfo._get_cpu_info_from_cpufreq_info()) == 4
+	assert len(cpuinfo._get_cpu_info_from_lscpu()) == 4
+	assert len(cpuinfo._get_cpu_info_from_proc_cpuinfo()) == 2
+	assert len(cpuinfo._get_cpu_info_from_sysctl()) == 0
+	assert len(cpuinfo._get_cpu_info_from_kstat()) == 0
+	assert len(cpuinfo._get_cpu_info_from_dmesg()) == 0
+	assert len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()) == 0
+	assert len(cpuinfo._get_cpu_info_from_ibm_pa_features()) == 0
+	assert len(cpuinfo._get_cpu_info_from_sysinfo()) == 0
+	assert len(cpuinfo._get_cpu_info_from_cpuid()) == 0
+	assert len(cpuinfo._get_cpu_info_internal()) == 13
 
-	def test_get_cpu_info_from_cpufreq_info(self):
-		info = cpuinfo._get_cpu_info_from_cpufreq_info()
 
-		self.assertEqual('1.5400 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('1.5400 GHz', info['hz_actual_friendly'])
-		self.assertEqual((1540000000, 0), info['hz_advertised'])
-		self.assertEqual((1540000000, 0), info['hz_actual'])
+def test_get_cpu_info_from_cpufreq_info():
+	info = cpuinfo._get_cpu_info_from_cpufreq_info()
 
-	def test_get_cpu_info_from_lscpu(self):
-		info = cpuinfo._get_cpu_info_from_lscpu()
+	assert info['hz_advertised_friendly'] == '1.5400 GHz'
+	assert info['hz_actual_friendly'] == '1.5400 GHz'
+	assert info['hz_advertised'] == (1540000000, 0)
+	assert info['hz_actual'] == (1540000000, 0)
 
-		self.assertEqual('1.5360 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('1.5360 GHz', info['hz_actual_friendly'])
-		self.assertEqual((1536000000, 0), info['hz_advertised'])
-		self.assertEqual((1536000000, 0), info['hz_actual'])
 
-	def test_get_cpu_info_from_proc_cpuinfo(self):
-		info = cpuinfo._get_cpu_info_from_proc_cpuinfo()
+def test_get_cpu_info_from_lscpu():
+	info = cpuinfo._get_cpu_info_from_lscpu()
 
-		self.assertEqual('ODROID-C2', info['hardware_raw'])
+	assert info['hz_advertised_friendly'] == '1.5360 GHz'
+	assert info['hz_actual_friendly'] == '1.5360 GHz'
+	assert info['hz_advertised'] == (1536000000, 0)
+	assert info['hz_actual'] == (1536000000, 0)
 
-		self.assertEqual(
-			['asimd', 'crc32', 'fp'],
-			info['flags']
-		)
 
-	def test_all(self):
-		info = cpuinfo._get_cpu_info_internal()
+def test_get_cpu_info_from_proc_cpuinfo():
+	info = cpuinfo._get_cpu_info_from_proc_cpuinfo()
 
-		self.assertEqual('ODROID-C2', info['hardware_raw'])
-		self.assertEqual('1.5400 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('1.5400 GHz', info['hz_actual_friendly'])
-		self.assertEqual((1540000000, 0), info['hz_advertised'])
-		self.assertEqual((1540000000, 0), info['hz_actual'])
-		self.assertEqual('ARM_8', info['arch'])
-		self.assertEqual(64, info['bits'])
-		self.assertEqual(4, info['count'])
+	assert info['hardware_raw'] == 'ODROID-C2'
 
-		self.assertEqual('aarch64', info['arch_string_raw'])
+	assert info['flags'] == ['asimd', 'crc32', 'fp']
 
-		self.assertEqual(
-			['asimd', 'crc32', 'fp'],
-			info['flags']
-		)
+
+def test_all():
+	info = cpuinfo._get_cpu_info_internal()
+
+	assert info['hardware_raw'] == 'ODROID-C2'
+	assert info['hz_advertised_friendly'] == '1.5400 GHz'
+	assert info['hz_actual_friendly'] == '1.5400 GHz'
+	assert info['hz_advertised'] == (1540000000, 0)
+	assert info['hz_actual'] == (1540000000, 0)
+	assert info['arch'] == 'ARM_8'
+	assert info['bits'] == 64
+	assert info['count'] == 4
+
+	assert info['arch_string_raw'] == 'aarch64'
+
+	assert info['flags'] == ['asimd', 'crc32', 'fp']

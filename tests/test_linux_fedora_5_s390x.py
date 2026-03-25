@@ -1,8 +1,7 @@
+import pytest
 
-
-import unittest
-from cpuinfo import *
-import helpers
+from cpuinfo import cpuinfo
+from tests import helpers
 
 
 class MockDataSource:
@@ -374,110 +373,114 @@ Flags:                 esan3 zarch stfle msa ldisp eimm dfp etf3eh highgprs sie
 		return returncode, output
 
 
-class TestLinuxFedora_5_s390x(unittest.TestCase):
-	def setUp(self):
-		helpers.backup_data_source(cpuinfo)
-		helpers.monkey_patch_data_source(cpuinfo, MockDataSource)
+@pytest.fixture(autouse=True)
+def _setup(monkeypatch):
+	helpers.monkey_patch_data_source(cpuinfo, MockDataSource, monkeypatch)
 
-	def tearDown(self):
-		helpers.restore_data_source(cpuinfo)
 
-	'''
-	Make sure calls return the expected number of fields.
-	'''
-	def test_returns(self):
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_registry()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpufreq_info()))
-		self.assertEqual(10, len(cpuinfo._get_cpu_info_from_lscpu()))
-		self.assertEqual(7, len(cpuinfo._get_cpu_info_from_proc_cpuinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysctl()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_kstat()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_dmesg()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_ibm_pa_features()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpuid()))
-		self.assertEqual(17, len(cpuinfo._get_cpu_info_internal()))
+def test_returns():
+	assert len(cpuinfo._get_cpu_info_from_registry()) == 0
+	assert len(cpuinfo._get_cpu_info_from_cpufreq_info()) == 0
+	assert len(cpuinfo._get_cpu_info_from_lscpu()) == 10
+	assert len(cpuinfo._get_cpu_info_from_proc_cpuinfo()) == 7
+	assert len(cpuinfo._get_cpu_info_from_sysctl()) == 0
+	assert len(cpuinfo._get_cpu_info_from_kstat()) == 0
+	assert len(cpuinfo._get_cpu_info_from_dmesg()) == 0
+	assert len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()) == 0
+	assert len(cpuinfo._get_cpu_info_from_ibm_pa_features()) == 0
+	assert len(cpuinfo._get_cpu_info_from_sysinfo()) == 0
+	assert len(cpuinfo._get_cpu_info_from_cpuid()) == 0
+	assert len(cpuinfo._get_cpu_info_internal()) == 17
 
-	def test_get_cpu_info_from_lscpu(self):
-		info = cpuinfo._get_cpu_info_from_lscpu()
 
-		self.assertEqual('IBM/S390', info['vendor_id_raw'])
-		#self.assertEqual('FIXME', info['brand'])
-		self.assertEqual('5.5040 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('5.5040 GHz', info['hz_actual_friendly'])
-		self.assertEqual((5504000000, 0), info['hz_advertised'])
-		self.assertEqual((5504000000, 0), info['hz_actual'])
+def test_get_cpu_info_from_lscpu():
+	info = cpuinfo._get_cpu_info_from_lscpu()
 
-		#self.assertEqual(7, info['stepping'])
-		#self.assertEqual(42, info['model'])
-		#self.assertEqual(6, info['family'])
+	assert info['vendor_id_raw'] == 'IBM/S390'
+	# self.assertEqual('FIXME', info['brand'])
+	assert info['hz_advertised_friendly'] == '5.5040 GHz'
+	assert info['hz_actual_friendly'] == '5.5040 GHz'
+	assert info['hz_advertised'] == (5504000000, 0)
+	assert info['hz_actual'] == (5504000000, 0)
 
-		self.assertEqual(64 * 1024, info['l1_instruction_cache_size'])
-		self.assertEqual(96 * 1024, info['l1_data_cache_size'])
+	# self.assertEqual(7, info['stepping'])
+	# self.assertEqual(42, info['model'])
+	# self.assertEqual(6, info['family'])
 
-		self.assertEqual(1024 * 1024, info['l2_cache_size'])
-		self.assertEqual(49152 * 1024, info['l3_cache_size'])
+	assert info['l1_instruction_cache_size'] == (64 * 1024)
+	assert info['l1_data_cache_size'] == (96 * 1024)
 
-		self.assertEqual(
-			['dfp', 'eimm', 'esan3', 'etf3eh', 'highgprs', 'ldisp',
-			'msa', 'sie', 'stfle', 'zarch']
-			,
-			info['flags']
-		)
+	assert info['l2_cache_size'] == (1024 * 1024)
+	assert info['l3_cache_size'] == (49152 * 1024)
 
-	def test_get_cpu_info_from_dmesg(self):
-		info = cpuinfo._get_cpu_info_from_dmesg()
+	assert info['flags'] == ['dfp', 'eimm', 'esan3', 'etf3eh', 'highgprs', 'ldisp', 'msa', 'sie', 'stfle', 'zarch']
 
-		#self.assertEqual('FIXME', info['brand'])
 
-	def test_get_cpu_info_from_proc_cpuinfo(self):
-		info = cpuinfo._get_cpu_info_from_proc_cpuinfo()
+def test_get_cpu_info_from_proc_cpuinfo():
+	info = cpuinfo._get_cpu_info_from_proc_cpuinfo()
 
-		self.assertEqual('IBM/S390', info['vendor_id_raw'])
-		#self.assertEqual('FIXME', info['brand'])
-		self.assertEqual('5.5040 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('5.5040 GHz', info['hz_actual_friendly'])
-		self.assertEqual((5504000000, 0), info['hz_advertised'])
-		self.assertEqual((5504000000, 0), info['hz_actual'])
+	assert info['vendor_id_raw'] == 'IBM/S390'
+	# self.assertEqual('FIXME', info['brand'])
+	assert info['hz_advertised_friendly'] == '5.5040 GHz'
+	assert info['hz_actual_friendly'] == '5.5040 GHz'
+	assert info['hz_advertised'] == (5504000000, 0)
+	assert info['hz_actual'] == (5504000000, 0)
 
-		self.assertEqual(49152 * 1024, info['l3_cache_size'])
+	assert info['l3_cache_size'] == (49152 * 1024)
 
-		#self.assertEqual(7, info['stepping'])
-		#self.assertEqual(42, info['model'])
-		#self.assertEqual(6, info['family'])
-		self.assertEqual(
-			['dfp', 'edat', 'eimm', 'esan3', 'etf3eh', 'highgprs', 'ldisp',
-			'msa', 'sie', 'stfle', 'te', 'zarch']
-			,
-			info['flags']
-		)
+	# self.assertEqual(7, info['stepping'])
+	# self.assertEqual(42, info['model'])
+	# self.assertEqual(6, info['family'])
+	assert info['flags'] == [
+		'dfp',
+		'edat',
+		'eimm',
+		'esan3',
+		'etf3eh',
+		'highgprs',
+		'ldisp',
+		'msa',
+		'sie',
+		'stfle',
+		'te',
+		'zarch',
+	]
 
-	def test_all(self):
-		info = cpuinfo._get_cpu_info_internal()
-		self.assertEqual('IBM/S390', info['vendor_id_raw'])
-		#self.assertEqual('FIXME', info['brand'])
-		self.assertEqual('5.5040 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('5.5040 GHz', info['hz_actual_friendly'])
-		self.assertEqual((5504000000, 0), info['hz_advertised'])
-		self.assertEqual((5504000000, 0), info['hz_actual'])
-		self.assertEqual('S390X', info['arch'])
-		self.assertEqual(64, info['bits'])
-		self.assertEqual(4, info['count'])
 
-		self.assertEqual('s390x', info['arch_string_raw'])
+def test_all():
+	info = cpuinfo._get_cpu_info_internal()
+	assert info['vendor_id_raw'] == 'IBM/S390'
+	# self.assertEqual('FIXME', info['brand'])
+	assert info['hz_advertised_friendly'] == '5.5040 GHz'
+	assert info['hz_actual_friendly'] == '5.5040 GHz'
+	assert info['hz_advertised'] == (5504000000, 0)
+	assert info['hz_actual'] == (5504000000, 0)
+	assert info['arch'] == 'S390X'
+	assert info['bits'] == 64
+	assert info['count'] == 4
 
-		self.assertEqual(64 * 1024, info['l1_instruction_cache_size'])
-		self.assertEqual(96 * 1024, info['l1_data_cache_size'])
+	assert info['arch_string_raw'] == 's390x'
 
-		self.assertEqual(1024 * 1024, info['l2_cache_size'])
-		self.assertEqual(49152 * 1024, info['l3_cache_size'])
+	assert info['l1_instruction_cache_size'] == (64 * 1024)
+	assert info['l1_data_cache_size'] == (96 * 1024)
 
-		#self.assertEqual(7, info['stepping'])
-		#self.assertEqual(42, info['model'])
-		#self.assertEqual(6, info['family'])
-		self.assertEqual(
-			['dfp', 'edat', 'eimm', 'esan3', 'etf3eh', 'highgprs', 'ldisp',
-			'msa', 'sie', 'stfle', 'te', 'zarch'],
-			info['flags']
-		)
+	assert info['l2_cache_size'] == (1024 * 1024)
+	assert info['l3_cache_size'] == (49152 * 1024)
+
+	# self.assertEqual(7, info['stepping'])
+	# self.assertEqual(42, info['model'])
+	# self.assertEqual(6, info['family'])
+	assert info['flags'] == [
+		'dfp',
+		'edat',
+		'eimm',
+		'esan3',
+		'etf3eh',
+		'highgprs',
+		'ldisp',
+		'msa',
+		'sie',
+		'stfle',
+		'te',
+		'zarch',
+	]

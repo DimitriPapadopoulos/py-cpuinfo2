@@ -1,8 +1,7 @@
+import pytest
 
-
-import unittest
-from cpuinfo import *
-import helpers
+from cpuinfo import cpuinfo
+from tests import helpers
 
 
 class MockDataSource:
@@ -71,71 +70,58 @@ name:   cpu_info0                       class:    misc
 		return returncode, output
 
 
+@pytest.fixture(autouse=True)
+def _setup(monkeypatch):
+	helpers.monkey_patch_data_source(cpuinfo, MockDataSource, monkeypatch)
 
-class TestOpenIndiana_5_11_Ryzen_7(unittest.TestCase):
-	def setUp(self):
-		helpers.backup_data_source(cpuinfo)
-		helpers.monkey_patch_data_source(cpuinfo, MockDataSource)
 
-	def tearDown(self):
-		helpers.restore_data_source(cpuinfo)
+def test_returns():
+	assert len(cpuinfo._get_cpu_info_from_registry()) == 0
+	assert len(cpuinfo._get_cpu_info_from_cpufreq_info()) == 0
+	assert len(cpuinfo._get_cpu_info_from_lscpu()) == 0
+	assert len(cpuinfo._get_cpu_info_from_proc_cpuinfo()) == 0
+	assert len(cpuinfo._get_cpu_info_from_sysctl()) == 0
+	assert len(cpuinfo._get_cpu_info_from_kstat()) == 10
+	assert len(cpuinfo._get_cpu_info_from_dmesg()) == 0
+	assert len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()) == 0
+	assert len(cpuinfo._get_cpu_info_from_ibm_pa_features()) == 0
+	assert len(cpuinfo._get_cpu_info_from_sysinfo()) == 0
+	assert len(cpuinfo._get_cpu_info_from_cpuid()) == 0
+	assert len(cpuinfo._get_cpu_info_internal()) == 17
 
-	'''
-	Make sure calls return the expected number of fields.
-	'''
-	def test_returns(self):
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_registry()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpufreq_info()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_lscpu()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_proc_cpuinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysctl()))
-		self.assertEqual(10, len(cpuinfo._get_cpu_info_from_kstat()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_dmesg()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_ibm_pa_features()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpuid()))
-		self.assertEqual(17, len(cpuinfo._get_cpu_info_internal()))
 
-	def test_get_cpu_info_from_kstat(self):
-		info = cpuinfo._get_cpu_info_from_kstat()
+def test_get_cpu_info_from_kstat():
+	info = cpuinfo._get_cpu_info_from_kstat()
 
-		self.assertEqual('AuthenticAMD', info['vendor_id_raw'])
-		self.assertEqual('AMD Ryzen 7 2700X Eight-Core Processor', info['brand_raw'])
-		self.assertEqual('3.6930 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('3.6926 GHz', info['hz_actual_friendly'])
-		self.assertEqual((3693000000, 0), info['hz_advertised'])
-		self.assertEqual((3692643590, 0), info['hz_actual'])
+	assert info['vendor_id_raw'] == 'AuthenticAMD'
+	assert info['brand_raw'] == 'AMD Ryzen 7 2700X Eight-Core Processor'
+	assert info['hz_advertised_friendly'] == '3.6930 GHz'
+	assert info['hz_actual_friendly'] == '3.6926 GHz'
+	assert info['hz_advertised'] == (3693000000, 0)
+	assert info['hz_actual'] == (3692643590, 0)
 
-		self.assertEqual(2, info['stepping'])
-		self.assertEqual(8, info['model'])
-		self.assertEqual(23, info['family'])
-		self.assertEqual(
-			['amd_mmx', 'amd_sysc', 'cmov', 'cx8', 'fpu', 'mmx', 'tsc']
-			,
-			info['flags']
-		)
+	assert info['stepping'] == 2
+	assert info['model'] == 8
+	assert info['family'] == 23
+	assert info['flags'] == ['amd_mmx', 'amd_sysc', 'cmov', 'cx8', 'fpu', 'mmx', 'tsc']
 
-	def test_all(self):
-		info = cpuinfo._get_cpu_info_internal()
 
-		self.assertEqual('AuthenticAMD', info['vendor_id_raw'])
-		self.assertEqual('AMD Ryzen 7 2700X Eight-Core Processor', info['brand_raw'])
-		self.assertEqual('3.6930 GHz', info['hz_advertised_friendly'])
-		self.assertEqual('3.6926 GHz', info['hz_actual_friendly'])
-		self.assertEqual((3693000000, 0), info['hz_advertised'])
-		self.assertEqual((3692643590, 0), info['hz_actual'])
-		self.assertEqual('X86_32', info['arch'])
-		self.assertEqual(32, info['bits'])
-		self.assertEqual(8, info['count'])
+def test_all():
+	info = cpuinfo._get_cpu_info_internal()
 
-		self.assertEqual('i86pc', info['arch_string_raw'])
+	assert info['vendor_id_raw'] == 'AuthenticAMD'
+	assert info['brand_raw'] == 'AMD Ryzen 7 2700X Eight-Core Processor'
+	assert info['hz_advertised_friendly'] == '3.6930 GHz'
+	assert info['hz_actual_friendly'] == '3.6926 GHz'
+	assert info['hz_advertised'] == (3693000000, 0)
+	assert info['hz_actual'] == (3692643590, 0)
+	assert info['arch'] == 'X86_32'
+	assert info['bits'] == 32
+	assert info['count'] == 8
 
-		self.assertEqual(2, info['stepping'])
-		self.assertEqual(8, info['model'])
-		self.assertEqual(23, info['family'])
-		self.assertEqual(
-			['amd_mmx', 'amd_sysc', 'cmov', 'cx8', 'fpu', 'mmx', 'tsc']
-			,
-			info['flags']
-		)
+	assert info['arch_string_raw'] == 'i86pc'
+
+	assert info['stepping'] == 2
+	assert info['model'] == 8
+	assert info['family'] == 23
+	assert info['flags'] == ['amd_mmx', 'amd_sysc', 'cmov', 'cx8', 'fpu', 'mmx', 'tsc']

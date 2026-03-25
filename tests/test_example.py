@@ -1,8 +1,7 @@
+import pytest
 
-
-import unittest
-from cpuinfo import *
-import helpers
+from cpuinfo import cpuinfo
+from tests import helpers
 
 
 class MockDataSource:
@@ -113,29 +112,26 @@ class MockDataSource:
 		return None
 
 
-class TestExample(unittest.TestCase):
-	def setUp(self):
-		helpers.backup_data_source(cpuinfo)
-		helpers.monkey_patch_data_source(cpuinfo, MockDataSource)
+@pytest.fixture(autouse=True)
+def _setup(monkeypatch):
+	helpers.monkey_patch_data_source(cpuinfo, MockDataSource, monkeypatch)
 
-	def tearDown(self):
-		helpers.restore_data_source(cpuinfo)
 
-	def test_all(self):
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_registry())
+def test_all():
+	assert cpuinfo._get_cpu_info_from_registry() == {}
 
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_proc_cpuinfo())
+	assert cpuinfo._get_cpu_info_from_proc_cpuinfo() == {}
 
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_sysctl())
+	assert cpuinfo._get_cpu_info_from_sysctl() == {}
 
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_kstat())
+	assert cpuinfo._get_cpu_info_from_kstat() == {}
 
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_dmesg())
+	assert cpuinfo._get_cpu_info_from_dmesg() == {}
 
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot())
+	assert cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot() == {}
 
-		self.assertEqual({}, cpuinfo._get_cpu_info_from_sysinfo())
+	assert cpuinfo._get_cpu_info_from_sysinfo() == {}
 
-		#self.assertEqual({}, cpuinfo._get_cpu_info_from_cpuid())
+	# self.assertEqual({}, cpuinfo._get_cpu_info_from_cpuid())
 
-		#self.assertEqual({}, cpuinfo._get_cpu_info_internal())
+	# self.assertEqual({}, cpuinfo._get_cpu_info_internal())

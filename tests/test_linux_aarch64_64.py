@@ -1,8 +1,7 @@
+import pytest
 
-
-import unittest
-from cpuinfo import *
-import helpers
+from cpuinfo import cpuinfo
+from tests import helpers
 
 
 class MockDataSource:
@@ -104,84 +103,71 @@ NUMA node1 CPU(s):     48-95
 		return returncode, output
 
 
-class TestLinux_Aarch_64(unittest.TestCase):
-	def setUp(self):
-		helpers.backup_data_source(cpuinfo)
-		helpers.monkey_patch_data_source(cpuinfo, MockDataSource)
+@pytest.fixture(autouse=True)
+def _setup(monkeypatch):
+	helpers.monkey_patch_data_source(cpuinfo, MockDataSource, monkeypatch)
 
-	def tearDown(self):
-		helpers.restore_data_source(cpuinfo)
 
-	'''
-	Make sure calls return the expected number of fields.
-	'''
-	def test_returns(self):
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_registry()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpufreq_info()))
-		self.assertEqual(3, len(cpuinfo._get_cpu_info_from_lscpu()))
-		self.assertEqual(1, len(cpuinfo._get_cpu_info_from_proc_cpuinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysctl()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_kstat()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_dmesg()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_ibm_pa_features()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_sysinfo()))
-		self.assertEqual(0, len(cpuinfo._get_cpu_info_from_cpuid()))
-		self.assertEqual(11, len(cpuinfo._get_cpu_info_internal()))
+def test_returns():
+	assert len(cpuinfo._get_cpu_info_from_registry()) == 0
+	assert len(cpuinfo._get_cpu_info_from_cpufreq_info()) == 0
+	assert len(cpuinfo._get_cpu_info_from_lscpu()) == 3
+	assert len(cpuinfo._get_cpu_info_from_proc_cpuinfo()) == 1
+	assert len(cpuinfo._get_cpu_info_from_sysctl()) == 0
+	assert len(cpuinfo._get_cpu_info_from_kstat()) == 0
+	assert len(cpuinfo._get_cpu_info_from_dmesg()) == 0
+	assert len(cpuinfo._get_cpu_info_from_cat_var_run_dmesg_boot()) == 0
+	assert len(cpuinfo._get_cpu_info_from_ibm_pa_features()) == 0
+	assert len(cpuinfo._get_cpu_info_from_sysinfo()) == 0
+	assert len(cpuinfo._get_cpu_info_from_cpuid()) == 0
+	assert len(cpuinfo._get_cpu_info_internal()) == 11
 
-	def test_get_cpu_info_from_lscpu(self):
-		info = cpuinfo._get_cpu_info_from_lscpu()
 
-		self.assertEqual(78 * 1024, info['l1_instruction_cache_size'])
-		self.assertEqual(32 * 1024, info['l1_data_cache_size'])
+def test_get_cpu_info_from_lscpu():
+	info = cpuinfo._get_cpu_info_from_lscpu()
 
-		self.assertEqual(16384 * 1024, info['l2_cache_size'])
+	assert info['l1_instruction_cache_size'] == (78 * 1024)
+	assert info['l1_data_cache_size'] == (32 * 1024)
 
-		self.assertEqual(3, len(info))
+	assert info['l2_cache_size'] == (16384 * 1024)
 
-	def test_get_cpu_info_from_proc_cpuinfo(self):
-		info = cpuinfo._get_cpu_info_from_proc_cpuinfo()
+	assert len(info) == 3
 
-		self.assertEqual(
-			['aes', 'asimd', 'atomics', 'crc32', 'evtstrm',
-			'fp', 'pmull', 'sha1', 'sha2']
-			,
-			info['flags']
-		)
 
-	@unittest.skip("FIXME: This fails because it does not have a way to get CPU brand string and Hz.")
-	def test_all(self):
-		info = cpuinfo._get_cpu_info_internal()
+def test_get_cpu_info_from_proc_cpuinfo():
+	info = cpuinfo._get_cpu_info_from_proc_cpuinfo()
 
-		self.assertEqual('', info['vendor_id_raw'])
-		self.assertEqual('FIXME', info['hardware_raw'])
-		self.assertEqual('FIXME', info['brand_raw'])
-		self.assertEqual('FIXME', info['hz_advertised_friendly'])
-		self.assertEqual('FIXME', info['hz_actual_friendly'])
-		self.assertEqual((1000000000, 0), info['hz_advertised'])
-		self.assertEqual((1000000000, 0), info['hz_actual'])
-		self.assertEqual('ARM_8', info['arch'])
-		self.assertEqual(64, info['bits'])
-		self.assertEqual(6, info['count'])
+	assert info['flags'] == ['aes', 'asimd', 'atomics', 'crc32', 'evtstrm', 'fp', 'pmull', 'sha1', 'sha2']
 
-		self.assertEqual('aarch64', info['arch_string_raw'])
 
-		self.assertEqual(78 * 1024, info['l1_instruction_cache_size'])
-		self.assertEqual(32 * 1024, info['l1_data_cache_size'])
+@pytest.mark.skip("FIXME: This fails because it does not have a way to get CPU brand string and Hz.")
+def test_all():
+	info = cpuinfo._get_cpu_info_internal()
 
-		self.assertEqual(16384 * 1024, info['l2_cache_size'])
-		self.assertEqual(0, info['l2_cache_line_size'])
-		self.assertEqual(0, info['l2_cache_associativity'])
+	assert info['vendor_id_raw'] == ''
+	assert info['hardware_raw'] == 'FIXME'
+	assert info['brand_raw'] == 'FIXME'
+	assert info['hz_advertised_friendly'] == 'FIXME'
+	assert info['hz_actual_friendly'] == 'FIXME'
+	assert info['hz_advertised'] == (1000000000, 0)
+	assert info['hz_actual'] == (1000000000, 0)
+	assert info['arch'] == 'ARM_8'
+	assert info['bits'] == 64
+	assert info['count'] == 6
 
-		self.assertEqual(0, info['l3_cache_size'])
+	assert info['arch_string_raw'] == 'aarch64'
 
-		self.assertEqual(0, info['stepping'])
-		self.assertEqual(0, info['model'])
-		self.assertEqual(0, info['family'])
-		self.assertEqual(0, info['processor_type'])
-		self.assertEqual(
-			['aes', 'asimd', 'atomics', 'crc32', 'evtstrm',
-			'fp', 'pmull', 'sha1', 'sha2']
-			,
-			info['flags']
-		)
+	assert info['l1_instruction_cache_size'] == (78 * 1024)
+	assert info['l1_data_cache_size'] == (32 * 1024)
+
+	assert info['l2_cache_size'] == (16384 * 1024)
+	assert info['l2_cache_line_size'] == 0
+	assert info['l2_cache_associativity'] == 0
+
+	assert info['l3_cache_size'] == 0
+
+	assert info['stepping'] == 0
+	assert info['model'] == 0
+	assert info['family'] == 0
+	assert info['processor_type'] == 0
+	assert info['flags'] == ['aes', 'asimd', 'atomics', 'crc32', 'evtstrm', 'fp', 'pmull', 'sha1', 'sha2']

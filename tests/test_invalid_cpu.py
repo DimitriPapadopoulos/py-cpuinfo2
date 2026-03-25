@@ -1,8 +1,7 @@
+import pytest
 
-
-import unittest
-from cpuinfo import *
-import helpers
+from cpuinfo import cpuinfo
+from tests import helpers
 
 
 class MockDataSource:
@@ -13,24 +12,19 @@ class MockDataSource:
 	uname_string_raw = 'unknown_cpu'
 
 
-class TestInvalidCPU(unittest.TestCase):
-	def setUp(self):
-		helpers.backup_data_source(cpuinfo)
-		helpers.monkey_patch_data_source(cpuinfo, MockDataSource)
+@pytest.fixture(autouse=True)
+def _setup(monkeypatch):
+	helpers.monkey_patch_data_source(cpuinfo, MockDataSource, monkeypatch)
 
-	def tearDown(self):
-		helpers.restore_data_source(cpuinfo)
 
-	def test_arch_parse_unknown(self):
-		# If the arch is unknown, the result should be null
-		arch, bits = cpuinfo._parse_arch(DataSource.arch_string_raw)
-		self.assertIsNone(arch)
-		self.assertIsNone(bits)
+def test_arch_parse_unknown():
+	# If the arch is unknown, the result should be null
+	arch, bits = cpuinfo._parse_arch(cpuinfo.DataSource.arch_string_raw)
+	assert arch is None
+	assert bits is None
 
-	def test_check_arch_exception(self):
-		# If the arch is unknown, it should raise and exception
-		try:
-			cpuinfo._check_arch()
-			self.fail('Failed to raise Exception')
-		except Exception as err:
-			self.assertEqual('py-cpuinfo currently only works on X86 and some ARM/LoongArch/MIPS/PPC/RISCV/SPARC/S390X CPUs.', err.args[0])
+
+def test_check_arch_exception():
+	# If the arch is unknown, it should raise and exception
+	with pytest.raises(Exception, match='py-cpuinfo currently only works on X86 and some'):
+		cpuinfo._check_arch()
