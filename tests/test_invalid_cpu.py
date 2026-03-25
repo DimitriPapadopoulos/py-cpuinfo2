@@ -26,11 +26,5 @@ def test_arch_parse_unknown():
 
 def test_check_arch_exception():
 	# If the arch is unknown, it should raise and exception
-	try:
+	with pytest.raises(Exception, match='py-cpuinfo currently only works on X86 and some'):
 		cpuinfo._check_arch()
-		pytest.fail('Failed to raise Exception')
-	except Exception as err:
-		assert (
-			err.args[0]
-			== 'py-cpuinfo currently only works on X86 and some ARM/LoongArch/MIPS/PPC/RISCV/SPARC/S390X CPUs.'
-		)

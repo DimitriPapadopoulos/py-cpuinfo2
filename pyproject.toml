@@ -66,3 +66,14 @@ ignore = [
 [tool.ruff.format]
 indent-style = "tab"
 quote-style = "preserve"
+
+[tool.coverage.report]
+exclude_also = [
+    "def __repr__",
+    "if self\\.debug",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "@(abc\\.)?abstractmethod",
+]

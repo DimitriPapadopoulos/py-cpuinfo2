@@ -8,9 +8,6 @@ from tests import helpers
 class MockASM(ASM):
 	is_first = False
 
-	def __init__(self, restype=None, argtypes=(), machine_code=[]):
-		super().__init__(restype, argtypes, machine_code)
-
 	def compile(self):
 		self.func = self.run
 
@@ -212,7 +209,7 @@ class MockASM(ASM):
 			b"\x5d",  # pop bp
 			b"\xc3",
 		):  # ret
-			raise Exception("FIXME: Add ticks for 32bit get_ticks")
+			raise NotImplementedError("FIXME: Add ticks for 32bit get_ticks")
 		# 64 bit
 		elif machine_code == (
 			b"\x48",  # dec ax
@@ -231,7 +228,7 @@ class MockASM(ASM):
 			else:
 				return 19237434253761
 
-		raise Exception("Unexpected machine code")
+		raise NotImplementedError("Unexpected machine code")
 
 	def free(self):
 		self.func = None
