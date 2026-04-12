@@ -8,7 +8,7 @@ import os, sys
 import glob
 import platform
 import multiprocessing
-import subprocess
+from subprocess import Popen, PIPE
 
 try:
 	import _winreg as winreg
@@ -25,8 +25,6 @@ out_file = open(out_file_name, 'w')
 
 
 def run_and_get_stdout(command, pipe_command=None):
-	from subprocess import Popen, PIPE
-
 	if not pipe_command:
 		p1 = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE)
 		output = p1.communicate()[0]
