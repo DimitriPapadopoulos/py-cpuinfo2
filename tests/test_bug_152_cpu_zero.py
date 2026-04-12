@@ -103,10 +103,6 @@ def test_get_cpu_info_from_lscpu():
 	info = cpuinfo._get_cpu_info_from_lscpu()
 
 	# Make sure fields with 0 are not filtered out
-	assert 'stepping' in info.keys()
-	assert 'model' in info.keys()
-	assert 'family' in info.keys()
-
 	assert info['stepping'] == 0
 	assert info['model'] == 0
 	assert info['family'] == 0
@@ -116,10 +112,6 @@ def test_get_cpu_info_from_proc_cpuinfo():
 	info = cpuinfo._get_cpu_info_from_proc_cpuinfo()
 
 	# Make sure fields with 0 are not filtered out
-	assert 'stepping' in info.keys()
-	assert 'model' in info.keys()
-	assert 'family' in info.keys()
-
 	assert info['stepping'] == 0
 	assert info['model'] == 0
 	assert info['family'] == 0
