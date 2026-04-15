@@ -42,19 +42,21 @@ class Trace:
 			frame = sys._getframe(depth + 1)  # +1 for this method itself
 			return frame.f_code.co_filename, frame.f_lineno
 		except Exception:
-			import inspect
+			import inspect  # noqa: PLC0415
 			frame = inspect.stack()[depth + 1]
 			return frame[1], frame[2]
 
 	def header(self, msg):
-		if not self._is_active: return
+		if not self._is_active:
+			return
 
 		file, line = self._caller_location(1)
 		self._output.write("{0} ({1} {2})\n".format(msg, file, line))
 		self._output.flush()
 
 	def success(self):
-		if not self._is_active: return
+		if not self._is_active:
+			return
 
 		file, line = self._caller_location(1)
 
@@ -62,7 +64,8 @@ class Trace:
 		self._output.flush()
 
 	def fail(self, msg):
-		if not self._is_active: return
+		if not self._is_active:
+			return
 
 		file, line = self._caller_location(1)
 
@@ -79,21 +82,24 @@ class Trace:
 			self._output.flush()
 
 	def command_header(self, msg):
-		if not self._is_active: return
+		if not self._is_active:
+			return
 
 		file, line = self._caller_location(3)
 		self._output.write("\t{0} ({1} {2})\n".format(msg, file, line))
 		self._output.flush()
 
 	def command_output(self, msg, output):
-		if not self._is_active: return
+		if not self._is_active:
+			return
 
 		self._output.write("\t\t{0}\n".format(msg))
 		self._output.write(''.join(['\t\t\t{0}\n'.format(n) for n in output.split('\n')]) + '\n')
 		self._output.flush()
 
 	def keys(self, keys, info, new_info):
-		if not self._is_active: return
+		if not self._is_active:
+			return
 
 		file, line = self._caller_location(2)
 
@@ -119,7 +125,8 @@ class Trace:
 		self._output.flush()
 
 	def write(self, msg):
-		if not self._is_active: return
+		if not self._is_active:
+			return
 
 		self._output.write(msg + '\n')
 		self._output.flush()
@@ -362,9 +369,7 @@ def _copy_new_fields(info, new_info):
 		if new_info.get(key, None) and not info.get(key, None):
 			info[key] = new_info[key]
 		elif key == 'flags' and new_info.get('flags'):
-			for f in new_info['flags']:
-				if f not in info['flags']: info['flags'].append(f)
-			info['flags'].sort()
+			info['flags'] = sorted(set(info['flags']) | set(new_info['flags']))
 
 def _get_field_actual(cant_be_number, raw_string, field_names):
 	for line in raw_string.splitlines():
@@ -862,9 +867,8 @@ class ASM:
 
 		if DataSource.is_windows:
 			# Allocate a memory segment the size of the machine code, and make it executable
-			size = len(machine_code)
 			# Alloc at least 1 page to ensure we own all pages that we want to change protection on
-			if size < 0x1000: size = 0x1000
+			size = max(0x1000, len(machine_code))
 			MEM_COMMIT = ctypes.c_ulong(0x1000)
 			PAGE_READWRITE = ctypes.c_ulong(0x4)
 			pfnVirtualAlloc = ctypes.windll.kernel32.VirtualAlloc
@@ -2263,7 +2267,8 @@ def _get_cpu_info_from_sysinfo_v2():
 		def get_subsection_flags(output):
 			retval = []
 			for line in output.split('\n')[1:]:
-				if not line.startswith('                ') and not line.startswith('		'): break
+				if not line.startswith('                ') and not line.startswith('		'):
+					break
 				for entry in line.strip().lower().split(' '):
 					retval.append(entry)
 			return retval
@@ -2699,4 +2704,3 @@ def get_cpu_info():
 def _configure_trace(is_active):
 	global g_trace
 	g_trace = Trace(is_active, False)
-
