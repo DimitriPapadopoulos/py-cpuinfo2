@@ -42,19 +42,21 @@ class Trace:
 			frame = sys._getframe(depth + 1)  # +1 for this method itself
 			return frame.f_code.co_filename, frame.f_lineno
 		except Exception:
-			import inspect
+			import inspect  # noqa: PLC0415
 			frame = inspect.stack()[depth + 1]
 			return frame[1], frame[2]
 
 	def header(self, msg):
-		if not self._is_active: return
+		if not self._is_active:
+			return
 
 		file, line = self._caller_location(1)
 		self._output.write("{0} ({1} {2})\n".format(msg, file, line))
 		self._output.flush()
 
 	def success(self):
-		if not self._is_active: return
+		if not self._is_active:
+			return
 
 		file, line = self._caller_location(1)
 
@@ -62,7 +64,8 @@ class Trace:
 		self._output.flush()
 
 	def fail(self, msg):
-		if not self._is_active: return
+		if not self._is_active:
+			return
 
 		file, line = self._caller_location(1)
 
@@ -79,21 +82,24 @@ class Trace:
 			self._output.flush()
 
 	def command_header(self, msg):
-		if not self._is_active: return
+		if not self._is_active:
+			return
 
 		file, line = self._caller_location(3)
 		self._output.write("\t{0} ({1} {2})\n".format(msg, file, line))
 		self._output.flush()
 
 	def command_output(self, msg, output):
-		if not self._is_active: return
+		if not self._is_active:
+			return
 
 		self._output.write("\t\t{0}\n".format(msg))
 		self._output.write(''.join(['\t\t\t{0}\n'.format(n) for n in output.split('\n')]) + '\n')
 		self._output.flush()
 
 	def keys(self, keys, info, new_info):
-		if not self._is_active: return
+		if not self._is_active:
+			return
 
 		file, line = self._caller_location(2)
 
@@ -119,7 +125,8 @@ class Trace:
 		self._output.flush()
 
 	def write(self, msg):
-		if not self._is_active: return
+		if not self._is_active:
+			return
 
 		self._output.write(msg + '\n')
 		self._output.flush()
@@ -362,9 +369,7 @@ def _copy_new_fields(info, new_info):
 		if new_info.get(key, None) and not info.get(key, None):
 			info[key] = new_info[key]
 		elif key == 'flags' and new_info.get('flags'):
-			for f in new_info['flags']:
-				if f not in info['flags']: info['flags'].append(f)
-			info['flags'].sort()
+			info['flags'] = sorted(set(info['flags']) | set(new_info['flags']))
 
 def _get_field_actual(cant_be_number, raw_string, field_names):
 	for line in raw_string.splitlines():
@@ -573,7 +578,7 @@ def _parse_cpu_brand_string_dx(cpu_string):
 	# Find all the strings inside brackets ()
 	starts = [m.start() for m in re.finditer(r"\(", cpu_string)]
 	ends = [m.start() for m in re.finditer(r"\)", cpu_string)]
-	insides = {k: v for k, v in zip(starts, ends)}
+	insides = dict(zip(starts, ends))
 	insides = [cpu_string[start+1 : end] for start, end in insides.items()]
 
 	# Find all the fields
@@ -628,10 +633,10 @@ def _parse_dmesg_output(output):
 				output.split('\nCPU0:')[1:] + \
 				output.split('\nCPU1:')[1:] + \
 				output.split('\nCPU:')[1:]
-		lines = [l.split('\n')[0].strip() for l in lines]
+		lines = [line.split('\n')[0].strip() for line in lines]
 
 		# Convert the lines to CPU strings
-		cpu_strings = [_parse_cpu_brand_string_dx(l) for l in lines]
+		cpu_strings = [_parse_cpu_brand_string_dx(line) for line in lines]
 
 		# Find the CPU string that has the most fields
 		best_string = None
@@ -668,10 +673,11 @@ def _parse_dmesg_output(output):
 					family = int(value.lstrip('0x'), 16)
 
 		# Features
-		flag_lines = []
-		for category in ['  Features=', '  Features2=', '  AMD Features=', '  AMD Features2=']:
-			if category in output:
-				flag_lines.append(output.split(category)[1].split('\n')[0])
+		flag_lines = [
+			output.split(category)[1].split('\n')[0]
+			for category in ['  Features=', '  Features2=', '  AMD Features=', '  AMD Features2=']
+			if category in output
+		]
 
 		flags = []
 		for line in flag_lines:
@@ -797,10 +803,7 @@ def _is_selinux_enforcing(trace):
 	for line in output.splitlines():
 		line = line.strip().lower()
 		if line.startswith("current mode:"):
-			if line.endswith("enforcing"):
-				return True
-			else:
-				return False
+			return line.endswith("enforcing")
 
 	# Figure out if we can execute heap and execute memory
 	can_selinux_exec_heap = False
@@ -823,10 +826,9 @@ def _filter_dict_keys_with_empty_values(info, acceptable_values = {}):
 		value = info[key]
 
 		# Keep if value is acceptable
-		if key in acceptable_values:
-			if acceptable_values[key] == value:
-				filtered_info[key] = value
-				continue
+		if key in acceptable_values and acceptable_values[key] == value:
+			filtered_info[key] = value
+			continue
 
 		# Filter out None, 0, "", (), {}, []
 		if not value:
@@ -841,7 +843,7 @@ def _filter_dict_keys_with_empty_values(info, acceptable_values = {}):
 			continue
 
 		# Filter out strings that start with "0.0"
-		if type(value) == str and value.startswith('0.0'):
+		if isinstance(value, str) and value.startswith('0.0'):
 			continue
 
 		filtered_info[key] = value
@@ -865,9 +867,8 @@ class ASM:
 
 		if DataSource.is_windows:
 			# Allocate a memory segment the size of the machine code, and make it executable
-			size = len(machine_code)
 			# Alloc at least 1 page to ensure we own all pages that we want to change protection on
-			if size < 0x1000: size = 0x1000
+			size = max(0x1000, len(machine_code))
 			MEM_COMMIT = ctypes.c_ulong(0x1000)
 			PAGE_READWRITE = ctypes.c_ulong(0x4)
 			pfnVirtualAlloc = ctypes.windll.kernel32.VirtualAlloc
@@ -983,10 +984,11 @@ class CPUID:
 		)
 
 		# Each 4bits is a ascii letter in the name
-		vendor_id = []
-		for reg in [ebx, edx, ecx]:
-			for n in [0, 8, 16, 24]:
-				vendor_id.append(chr((reg >> n) & 0xFF))
+		vendor_id = [
+			chr((reg >> n) & 0xFF)
+			for reg in [ebx, edx, ecx]
+			for n in [0, 8, 16, 24]
+		]
 		vendor_id = ''.join(vendor_id)
 
 		return vendor_id
@@ -1610,20 +1612,20 @@ def _get_cpu_info_from_cpuid():
 			if output is None:
 				return {}
 
-			if 'output' in output and output['output']:
+			if output.get('output'):
 				g_trace.write(output['output'])
 
 			if 'is_fail' not in output:
 				g_trace.fail('Failed to get is_fail from CPUID process. Skipping ...')
 				return {}
 
-			if 'err' in output and output['err']:
+			if output.get('err'):
 				g_trace.fail('Failed to run CPUID in process. Skipping ...')
 				g_trace.write(output['err'])
 				g_trace.write('Failed ...')
 				return {}
 
-			if 'is_fail' in output and output['is_fail']:
+			if output.get('is_fail'):
 				g_trace.write('Failed ...')
 				return {}
 
@@ -2265,7 +2267,8 @@ def _get_cpu_info_from_sysinfo_v2():
 		def get_subsection_flags(output):
 			retval = []
 			for line in output.split('\n')[1:]:
-				if not line.startswith('                ') and not line.startswith('		'): break
+				if not line.startswith('                ') and not line.startswith('		'):
+					break
 				for entry in line.strip().lower().split(' '):
 					retval.append(entry)
 			return retval
@@ -2701,4 +2704,3 @@ def get_cpu_info():
 def _configure_trace(is_active):
 	global g_trace
 	g_trace = Trace(is_active, False)
-
