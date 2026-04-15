@@ -68,6 +68,7 @@ ignore = [
     "UP030",
     "UP032",
 ]
+exclude = ["tools/get_system_info.py"]
 
 [tool.ruff.format]
 indent-style = "tab"
